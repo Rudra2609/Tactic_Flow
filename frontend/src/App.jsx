@@ -631,8 +631,8 @@ function App() {
                         style={{ padding: '12px', borderRadius: '4px', border: '1px solid #ccc', background: '#1e293b', color: '#fff', width: '100%', boxSizing: 'border-box' }}
                       />
                       <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button className="btn back-btn" onClick={() => setShowLobbyModal(false)} style={{ flex: 1, margin: 0 }}>Close</button>
                         <button className="btn" onClick={joinRoom} style={{ background: '#3b82f6', flex: 1, margin: 0 }}>Join</button>
+                        <button className="btn back-btn" onClick={() => setShowLobbyModal(false)} style={{ flex: 1, margin: 0 }}>Close</button>
                       </div>
                     </div>
                   </>

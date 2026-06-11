@@ -56,6 +56,7 @@ function App() {
   const [showLobbyModal, setShowLobbyModal] = useState(false);
   const [lobbyError, setLobbyError] = useState("");
   const dbRef = useRef(null); // Keep track of current game ref for cleanup
+  const isQuitting = useRef(false); // Track if we intentionally quit
 
   // Chat states
   const [chatMessages, setChatMessages] = useState([]);
@@ -188,6 +189,7 @@ function App() {
   };
 
   const listenToRoom = (code, isHostLocal) => {
+    isQuitting.current = false;
     const gameRef = ref(db, `games/${code}`);
     dbRef.current = gameRef;
     let hasStarted = false;
@@ -212,7 +214,7 @@ function App() {
     onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) {
-        if (hasStarted) {
+        if (hasStarted && !isQuitting.current) {
           alert("The Other Player left");
           setGameMode("menu");
           setRoomId(null);
@@ -317,6 +319,8 @@ function App() {
     if (gameState === 0 && !window.confirm("Are you sure you want to end the game?")) {
       return;
     }
+    
+    isQuitting.current = true;
     
     // Clean up online room if quitting an active online match
     if (gameMode === "online" && dbRef.current) {

@@ -40,7 +40,7 @@ function App() {
     setStatus(mode === "ai" ? "Your turn (White)" : "White's turn");
   };
 
-  const onDrop = (sourceSquare, targetSquare) => {
+  const onDrop = ({ sourceSquare, targetSquare }) => {
     if (!wasmModule) {
       setStatus("Error: WASM not loaded.");
       return false;

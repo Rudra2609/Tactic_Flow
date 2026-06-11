@@ -447,15 +447,13 @@ function App() {
           <div className="board-wrapper">
             <div style={{ width: 600, height: 600 }}>
               <Chessboard 
-                options={{
-                  position: fen,
-                  onSquareClick: onEditorSquareClick,
-                  onPieceDrop: onEditorPieceDrop,
-                  darkSquareStyle: { backgroundColor: "#779556" },
-                  lightSquareStyle: { backgroundColor: "#ebecd0" },
-                  animationDurationInMs: 0,
-                  arePiecesDraggable: true
-                }}
+                position={fen}
+                onSquareClick={onEditorSquareClick}
+                onPieceDrop={onEditorPieceDrop}
+                customDarkSquareStyle={{ backgroundColor: "#779556" }}
+                customLightSquareStyle={{ backgroundColor: "#ebecd0" }}
+                animationDuration={0}
+                arePiecesDraggable={true}
               />
             </div>
           </div>
@@ -503,14 +501,12 @@ function App() {
             )}
             <div style={{ width: 600, height: 600 }}>
               <Chessboard 
-                options={{
-                  position: fen,
-                  onPieceDrop: onDrop,
-                  darkSquareStyle: { backgroundColor: "#779556" },
-                  lightSquareStyle: { backgroundColor: "#ebecd0" },
-                  animationDurationInMs: 200,
-                  arePiecesDraggable: gameState === 0 && !pendingPromotion
-                }}
+                position={fen}
+                onPieceDrop={onDrop}
+                customDarkSquareStyle={{ backgroundColor: "#779556" }}
+                customLightSquareStyle={{ backgroundColor: "#ebecd0" }}
+                animationDuration={200}
+                arePiecesDraggable={gameState === 0 && !pendingPromotion}
               />
             </div>
           </div>

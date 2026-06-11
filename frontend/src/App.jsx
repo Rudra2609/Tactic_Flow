@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { ref, set, onValue, update, get, onDisconnect, remove } from 'firebase/database';
+import { ref, set, onValue, update, get, onDisconnect, remove, push } from 'firebase/database';
 import { auth, db } from './firebase';
 import Auth from './Auth';
 import './App.css';
@@ -56,6 +56,13 @@ function App() {
   const [showLobbyModal, setShowLobbyModal] = useState(false);
   const [lobbyError, setLobbyError] = useState("");
   const dbRef = useRef(null); // Keep track of current game ref for cleanup
+
+  // Chat states
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [activeTab, setActiveTab] = useState("history"); // "history" or "chat"
+  const [unreadChat, setUnreadChat] = useState(false);
+  const chatMessagesEndRef = useRef(null);
 
   // Move history state
   const [chess] = useState(new Chess());
@@ -185,6 +192,23 @@ function App() {
     dbRef.current = gameRef;
     let hasStarted = false;
     
+    const chatRef = ref(db, `games/${code}/chat`);
+    onValue(chatRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const msgs = Object.values(data);
+        msgs.sort((a, b) => a.timestamp - b.timestamp);
+        setChatMessages(msgs);
+        
+        const lastMsg = msgs[msgs.length - 1];
+        if (lastMsg && lastMsg.sender !== (user?.displayName || user?.email?.split('@')[0])) {
+          setUnreadChat(true);
+        }
+      } else {
+        setChatMessages([]);
+      }
+    });
+    
     onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) {
@@ -228,6 +252,26 @@ function App() {
       }
     }
   }, [incomingMove, wasmModule, gameMode]);
+
+  useEffect(() => {
+    if (activeTab === "chat") {
+      setUnreadChat(false);
+      chatMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, activeTab]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !roomId) return;
+    
+    const chatRef = ref(db, `games/${roomId}/chat`);
+    push(chatRef, {
+      sender: user?.displayName || user?.email?.split('@')[0] || "Anonymous",
+      text: chatInput.trim(),
+      timestamp: Date.now()
+    });
+    setChatInput("");
+  };
 
   const handleStartGame = (mode, onlineColor = null) => {
     if (!wasmModule) {
@@ -819,20 +863,69 @@ function App() {
           </div>
           
           <div className="history-sidebar">
-            <h3 className="history-title">Move History</h3>
-            <div className="history-list" ref={historyContainerRef}>
-              {movePairs.map((pair, idx) => (
-                <div key={idx} className="history-row">
-                  <div className="history-number">{idx + 1}.</div>
-                  <div className={`history-move ${moveHistory.length - 1 === idx * 2 ? 'active-move' : ''}`}>
-                    {formatSan(pair.white.san, 'white-piece')}
+            {gameMode === "online" ? (
+              <div className="sidebar-tabs">
+                <button 
+                  className={`tab-btn ${activeTab === "history" ? "active" : ""}`}
+                  onClick={() => setActiveTab("history")}
+                >
+                  Move History
+                </button>
+                <button 
+                  className={`tab-btn ${activeTab === "chat" ? "active" : ""}`}
+                  onClick={() => { setActiveTab("chat"); setUnreadChat(false); }}
+                >
+                  Live Chat {activeTab !== "chat" && unreadChat && <span className="unread-dot"></span>}
+                </button>
+              </div>
+            ) : (
+              <h3 className="history-title">Move History</h3>
+            )}
+
+            {activeTab === "history" ? (
+              <div className="history-list" ref={historyContainerRef}>
+                {movePairs.map((pair, idx) => (
+                  <div key={idx} className="history-row">
+                    <div className="history-number">{idx + 1}.</div>
+                    <div className={`history-move ${moveHistory.length - 1 === idx * 2 ? 'active-move' : ''}`}>
+                      {formatSan(pair.white.san, 'white-piece')}
+                    </div>
+                    <div className={`history-move ${moveHistory.length - 1 === idx * 2 + 1 ? 'active-move' : ''}`}>
+                      {pair.black ? formatSan(pair.black.san, 'black-piece') : ''}
+                    </div>
                   </div>
-                  <div className={`history-move ${moveHistory.length - 1 === idx * 2 + 1 ? 'active-move' : ''}`}>
-                    {pair.black ? formatSan(pair.black.san, 'black-piece') : ''}
-                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="chat-container">
+                <div className="chat-messages">
+                  {chatMessages.length === 0 ? (
+                    <div className="chat-empty">Say hi to your friend!</div>
+                  ) : (
+                    chatMessages.map((msg, idx) => {
+                      const isMe = msg.sender === (user?.displayName || user?.email?.split('@')[0]);
+                      return (
+                        <div key={idx} className={`chat-message ${isMe ? 'message-mine' : 'message-theirs'}`}>
+                          <span className="chat-sender">{isMe ? "You" : msg.sender}</span>
+                          <div className="chat-bubble">{msg.text}</div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={chatMessagesEndRef} />
                 </div>
-              ))}
-            </div>
+                <form className="chat-input-form" onSubmit={handleSendMessage}>
+                  <input 
+                    type="text" 
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Type a message..."
+                    className="chat-input"
+                  />
+                  <button type="submit" className="chat-send-btn">Send</button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       )}

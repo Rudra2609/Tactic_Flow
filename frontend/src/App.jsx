@@ -415,16 +415,8 @@ function App() {
     <div className="app-background">
       {gameMode === "menu" ? (
         <div className="menu-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
             <h1 className="title" style={{ marginBottom: 0 }}>Tactic Flow</h1>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
-                {user?.displayName || user?.email?.split('@')[0]}
-              </span>
-              <button className="btn" style={{ padding: '6px 20px', fontSize: '0.85rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '12px' }} onClick={() => signOut(auth)}>
-                Log Out
-              </button>
-            </div>
           </div>
           <div className="menu-card">
             <p className="status-text">{status}</p>
@@ -463,6 +455,15 @@ function App() {
 
             <h2>Analysis Mode</h2>
             <button className="btn" style={{background: '#3b82f6'}} onClick={() => handleStartGame("editor")}>Board Editor</button>
+            
+            <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-sub)', fontSize: '0.9rem' }}>
+                Logged in as <strong style={{ color: 'var(--text-main)' }}>{user?.displayName || user?.email?.split('@')[0]}</strong>
+              </span>
+              <button className="btn" style={{ padding: '6px 16px', fontSize: '0.85rem', background: 'rgba(244, 63, 94, 0.1)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.2)', width: 'auto' }} onClick={() => signOut(auth)}>
+                Log Out
+              </button>
+            </div>
           </div>
         </div>
       ) : gameMode === "editor" ? (

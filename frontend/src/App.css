@@ -122,6 +122,9 @@ body {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
+  font-size: 0.9rem;
+}
+
 .time-control-container {
   display: flex;
   flex-direction: column;

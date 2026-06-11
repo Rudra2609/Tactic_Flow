@@ -39,6 +39,7 @@ function App() {
   const [blackTime, setBlackTime] = useState(600);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const historyContainerRef = useRef(null);
+  const [moveFrom, setMoveFrom] = useState(null);
 
   // Move history state
   const [chess] = useState(new Chess());
@@ -205,6 +206,7 @@ function App() {
   };
 
   const onDrop = ({ sourceSquare, targetSquare }) => {
+    setMoveFrom(null);
     if (!wasmModule || gameState !== 0 || pendingPromotion) return false;
 
     try {
@@ -231,6 +233,32 @@ function App() {
     if (!pendingPromotion) return;
     executeMove(pendingPromotion.fromX, pendingPromotion.fromY, pendingPromotion.toX, pendingPromotion.toY, pieceEnum);
     setPendingPromotion(null);
+  };
+
+  const onGameSquareClick = (...args) => {
+    if (gameState !== 0 || !wasmModule || pendingPromotion) return;
+    
+    let square = typeof args[0] === 'string' ? args[0] : args[0]?.square;
+    if (!square) return;
+
+    const y = square.charCodeAt(0) - 97;
+    const x = 8 - parseInt(square[1]);
+    const piece = getPieceAt(fen, x, y);
+
+    const isWhiteTurn = wasmModule.getTurn() === 0;
+    const isOwnPiece = piece && ((isWhiteTurn && piece >= 'A' && piece <= 'Z') || (!isWhiteTurn && piece >= 'a' && piece <= 'z'));
+
+    if (!moveFrom) {
+      if (isOwnPiece) {
+        setMoveFrom(square);
+      }
+    } else {
+      if (isOwnPiece && moveFrom !== square) {
+        setMoveFrom(square);
+      } else {
+        onDrop({ sourceSquare: moveFrom, targetSquare: square });
+      }
+    }
   };
 
   const onEditorSquareClick = ({ square }) => {
@@ -520,6 +548,9 @@ function App() {
                 options={{
                   position: fen,
                   onPieceDrop: onDrop,
+                  onSquareClick: onGameSquareClick,
+                  boardOrientation: gameMode === "ai" && elo === 3200 ? "black" : "white",
+                  squareStyles: moveFrom ? { [moveFrom]: { backgroundColor: "rgba(255, 255, 0, 0.5)" } } : {},
                   darkSquareStyle: { backgroundColor: "#779556" },
                   lightSquareStyle: { backgroundColor: "#ebecd0" },
                   animationDurationInMs: 200,

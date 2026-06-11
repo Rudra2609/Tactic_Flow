@@ -30,7 +30,6 @@ function App() {
   const [pendingPromotion, setPendingPromotion] = useState(null);
 
   // Editor states
-  const [editorPiece, setEditorPiece] = useState('wP');
   const [editorTurn, setEditorTurn] = useState('w');
 
   // Time control states
@@ -238,7 +237,15 @@ function App() {
     setFen(fenParts.join(' '));
   };
 
-  const onEditorPieceDrop = (sourceSquare, targetSquare) => {
+  const onEditorPieceDrop = (sourceSquare, targetSquare, piece) => {
+    if (sourceSquare === 'spare') {
+      chess.put({ type: piece[1].toLowerCase(), color: piece[0] }, targetSquare);
+      const fenParts = chess.fen().split(' ');
+      fenParts[1] = editorTurn;
+      setFen(fenParts.join(' '));
+      return true;
+    }
+    
     const p = chess.remove(sourceSquare);
     if (p) {
       chess.put(p, targetSquare);
@@ -248,6 +255,13 @@ function App() {
       return true;
     }
     return false;
+  };
+
+  const onEditorPieceDropOffBoard = (sourceSquare) => {
+    chess.remove(sourceSquare);
+    const fenParts = chess.fen().split(' ');
+    fenParts[1] = editorTurn;
+    setFen(fenParts.join(' '));
   };
 
   const handleEditorTurnToggle = (turn) => {
@@ -324,12 +338,6 @@ function App() {
     }
   };
 
-  const piecesArray = [
-    { id: 'wK', icon: '♔' }, { id: 'wQ', icon: '♕' }, { id: 'wR', icon: '♖' }, { id: 'wB', icon: '♗' }, { id: 'wN', icon: '♘' }, { id: 'wP', icon: '♙' },
-    { id: 'bK', icon: '♚' }, { id: 'bQ', icon: '♛' }, { id: 'bR', icon: '♜' }, { id: 'bB', icon: '♝' }, { id: 'bN', icon: '♞' }, { id: 'bP', icon: '♟' },
-    { id: 'eraser', icon: '❌' }
-  ];
-
   const formatTime = (seconds) => {
     if (timeControl.minutes === 0) return "∞";
     const m = Math.floor(seconds / 60);
@@ -404,18 +412,7 @@ function App() {
           <div className="sidebar editor-sidebar">
             <h2 className="title-small">Board Editor</h2>
             <div className="editor-controls">
-              <p>Select piece, then click square to place.</p>
-              <div className="piece-palette">
-                {piecesArray.map(p => (
-                  <button 
-                    key={p.id} 
-                    className={`palette-btn ${editorPiece === p.id ? 'selected' : ''}`}
-                    onClick={() => setEditorPiece(p.id)}
-                  >
-                    {p.icon}
-                  </button>
-                ))}
-              </div>
+              <p>Drag spare pieces onto the board to build your custom position.</p>
               
               <div className="turn-toggle">
                 <label>Side to move: </label>
@@ -450,10 +447,13 @@ function App() {
                 position={fen}
                 onSquareClick={onEditorSquareClick}
                 onPieceDrop={onEditorPieceDrop}
+                onPieceDropOffBoard={onEditorPieceDropOffBoard}
                 customDarkSquareStyle={{ backgroundColor: "#779556" }}
                 customLightSquareStyle={{ backgroundColor: "#ebecd0" }}
                 animationDuration={0}
                 arePiecesDraggable={true}
+                sparePieces={true}
+                dropOffBoard="trash"
               />
             </div>
           </div>

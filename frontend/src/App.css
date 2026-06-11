@@ -99,6 +99,31 @@ body {
   filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.4));
 }
 
+.btn.ai-btn:hover {
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+}
+
+.logout-btn {
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  background: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+  border-radius: 100px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  width: auto;
+}
+
+.logout-btn:hover {
+  background: #f43f5e;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+  transform: translateY(-2px);
+}
+
 .title-small {
   font-size: 2rem;
   font-weight: 800;

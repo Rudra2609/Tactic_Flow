@@ -460,7 +460,7 @@ function App() {
               <span style={{ color: 'var(--text-sub)', fontSize: '0.9rem' }}>
                 Logged in as <strong style={{ color: 'var(--text-main)' }}>{user?.displayName || user?.email?.split('@')[0]}</strong>
               </span>
-              <button className="btn" style={{ padding: '6px 16px', fontSize: '0.85rem', background: 'rgba(244, 63, 94, 0.1)', color: '#f43f5e', border: '1px solid rgba(244, 63, 94, 0.2)', width: 'auto' }} onClick={() => signOut(auth)}>
+              <button className="logout-btn" onClick={() => signOut(auth)}>
                 Log Out
               </button>
             </div>

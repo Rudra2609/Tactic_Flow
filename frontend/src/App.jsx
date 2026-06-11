@@ -422,22 +422,31 @@ function App() {
           <div className="menu-card">
             <p className="status-text">{status}</p>
             
-            <div className="time-control-section">
-              <label>Time Control: </label>
-              <select 
-                value={`${timeControl.minutes}|${timeControl.increment}`}
-                onChange={(e) => {
-                  const [m, i] = e.target.value.split('|').map(Number);
-                  setTimeControl({ minutes: m, increment: i });
-                }}
-                className="time-select"
-              >
-                <option value="0|0">Unlimited</option>
-                <option value="3|2">Blitz (3 | 2)</option>
-                <option value="5|3">Blitz (5 | 3)</option>
-                <option value="10|0">Rapid (10 | 0)</option>
-                <option value="15|10">Rapid (15 | 10)</option>
-              </select>
+            <div className="time-control-container">
+              <label className="time-control-label">Time Control</label>
+              <div className="time-options-grid">
+                {[
+                  { label: 'Unlimited', value: '0|0' },
+                  { label: 'Blitz 3|2', value: '3|2' },
+                  { label: 'Blitz 5|3', value: '5|3' },
+                  { label: 'Rapid 10|0', value: '10|0' },
+                  { label: 'Rapid 15|10', value: '15|10' }
+                ].map(opt => {
+                  const isSelected = `${timeControl.minutes}|${timeControl.increment}` === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      className={`time-pill ${isSelected ? 'selected' : ''}`}
+                      onClick={() => {
+                        const [m, i] = opt.value.split('|').map(Number);
+                        setTimeControl({ minutes: m, increment: i });
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <h2>Select Game Mode</h2>

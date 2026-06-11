@@ -163,6 +163,7 @@ function App() {
             guestName: user.displayName || user.email.split('@')[0],
             status: "playing"
           });
+          onDisconnect(gameRef).remove(); // If guest drops, destroy room
           setRoomId(code);
           setIsHost(false);
           setPlayerColor("black");
@@ -187,8 +188,12 @@ function App() {
     onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) {
-        setStatus("Opponent disconnected. Game over.");
-        setGameState(1);
+        if (hasStarted) {
+          alert("The Other Player left");
+          setGameMode("menu");
+          setRoomId(null);
+          setShowLobbyModal(false);
+        }
         return;
       }
 
@@ -199,7 +204,6 @@ function App() {
         
         if (!hasStarted) {
           hasStarted = true;
-          // The onValue callback is a closure, but hasStarted is tracked per listener instance
           handleStartGame("online");
         }
         
@@ -207,8 +211,6 @@ function App() {
         if (data.lastMove) {
           const expectedTurn = isHostLocal ? 1 : 0; // Host expects black's move (1)
           if (data.lastMove.turn === expectedTurn) {
-            // It's the opponent's move, we need to apply it
-            // We use a window global or ref to avoid stale closures, but for now we'll rely on a useEffect to process it
             setIncomingMove(data.lastMove);
           }
         }
@@ -713,8 +715,14 @@ function App() {
       ) : (
         <div className="game-container">
           <div className="sidebar">
-            <h2 className="title-small">{gameMode === "ai" ? "Player vs AI" : "Player vs Player"}</h2>
-            {gameMode === "ai" && <p className="subtitle">AI ELO: {elo}</p>}
+            <h2>{gameMode === "pvp" ? "Player vs Player" : gameMode === "ai" ? "Player vs AI" : "Online Match"}</h2>
+            
+            {gameMode === "online" && (
+              <div style={{ marginBottom: '1rem', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                 <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem' }}>Opponent: <strong style={{ color: '#10b981' }}>{opponentName || "Waiting..."}</strong></p>
+                 <p style={{ margin: '8px 0 0 0', color: '#94a3b8', fontSize: '0.9rem' }}>You are playing: <strong style={{ color: playerColor === 'white' ? '#fff' : '#000', textShadow: playerColor === 'black' ? '0 0 2px rgba(255,255,255,0.5)' : 'none', textTransform: 'capitalize' }}>{playerColor}</strong></p>
+              </div>
+            )}
             
             <div className="clocks-container">
               <div className={`clock ${wasmModule && wasmModule.getTurn() === 1 ? 'active' : ''}`}>
@@ -757,7 +765,7 @@ function App() {
                   position: fen,
                   onPieceDrop: onDrop,
                   onSquareClick: onGameSquareClick,
-                  boardOrientation: gameMode === "ai" ? playerColor : "white",
+                  boardOrientation: (gameMode === "ai" || gameMode === "online") ? playerColor : "white",
                   squareStyles: moveFrom ? { [moveFrom]: { backgroundColor: "rgba(14, 165, 233, 0.5)", boxShadow: "inset 0 0 15px rgba(14, 165, 233, 0.8)" } } : {},
                   darkSquareStyle: { backgroundColor: "#312e81" },
                   lightSquareStyle: { backgroundColor: "#94a3b8" },

@@ -819,6 +819,9 @@ body {
 
   .board-wrapper {
     order: -1;
+    flex: none;
+    width: 100%;
+    min-height: min-content;
   }
 
   .sidebar {

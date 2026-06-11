@@ -41,38 +41,49 @@ function App() {
   };
 
   const onDrop = (sourceSquare, targetSquare) => {
-    if (!wasmModule) return false;
-
-    const fromY = sourceSquare.charCodeAt(0) - 97;
-    const fromX = 8 - parseInt(sourceSquare[1]);
-    const toY = targetSquare.charCodeAt(0) - 97;
-    const toX = 8 - parseInt(targetSquare[1]);
-
-    const isLegal = wasmModule.makeMove(fromX, fromY, toX, toY, 1);
-    
-    if (isLegal) {
-      const newFen = wasmModule.getBoardState();
-      setFen(newFen);
-      
-      const turnMsg = wasmModule.getTurn() === 0 ? "White's turn" : "Black's turn";
-      setStatus(turnMsg);
-
-      if (gameMode === "ai" && wasmModule.getTurn() === 1) {
-        setStatus("AI is thinking...");
-        setTimeout(() => {
-          const aiMoveStr = wasmModule.getBestMove(elo);
-          const parts = aiMoveStr.split(",");
-          if (parts.length === 4) {
-            const [aiFromX, aiFromY, aiToX, aiToY] = parts.map(Number);
-            wasmModule.makeMove(aiFromX, aiFromY, aiToX, aiToY, 1);
-            setFen(wasmModule.getBoardState());
-            setStatus("Your turn (White)");
-          }
-        }, 100);
-      }
-      return true;
+    if (!wasmModule) {
+      setStatus("Error: WASM not loaded.");
+      return false;
     }
-    return false;
+
+    try {
+      const fromY = sourceSquare.charCodeAt(0) - 97;
+      const fromX = 8 - parseInt(sourceSquare[1]);
+      const toY = targetSquare.charCodeAt(0) - 97;
+      const toX = 8 - parseInt(targetSquare[1]);
+
+      const isLegal = wasmModule.makeMove(fromX, fromY, toX, toY, 1);
+      
+      if (isLegal) {
+        setFen(wasmModule.getBoardState());
+        setStatus(wasmModule.getTurn() === 0 ? "White's turn" : "Black's turn");
+        
+        if (gameMode === "ai" && wasmModule.getTurn() === 1) {
+          setStatus("AI thinking...");
+          setTimeout(() => {
+            try {
+              const aiMoveStr = wasmModule.getBestMove(elo);
+              const parts = aiMoveStr.split(",");
+              if (parts.length === 4) {
+                const [aiFromX, aiFromY, aiToX, aiToY] = parts.map(Number);
+                wasmModule.makeMove(aiFromX, aiFromY, aiToX, aiToY, 1);
+                setFen(wasmModule.getBoardState());
+                setStatus("Your turn (White)");
+              }
+            } catch(e) {
+              setStatus("AI Error: " + e.message);
+            }
+          }, 50);
+        }
+        return true;
+      } else {
+        setStatus(`Invalid: ${sourceSquare}(${fromX},${fromY})->${targetSquare}(${toX},${toY}) Turn:${wasmModule.getTurn()}`);
+        return false;
+      }
+    } catch (e) {
+      setStatus(`Crash: ${e.message}`);
+      return false;
+    }
   };
 
   return (

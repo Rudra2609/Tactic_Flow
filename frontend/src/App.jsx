@@ -408,8 +408,8 @@ function App() {
     });
   }
 
-  if (authLoading) return <div className="app-background"><p className="status-text">Loading...</p></div>;
-  if (!user) return <Auth onAuthSuccess={() => {}} />;
+  if (authLoading) return <div className="app-background"><p className="status-text" style={{ position: 'relative', zIndex: 1 }}>Loading...</p></div>;
+  if (!user) return <div className="app-background"><Auth onAuthSuccess={() => {}} /></div>;
 
   return (
     <div className="app-background">
@@ -568,10 +568,11 @@ function App() {
                   onPieceDrop: onDrop,
                   onSquareClick: onGameSquareClick,
                   boardOrientation: gameMode === "ai" && elo === 3200 ? "black" : "white",
-                  squareStyles: moveFrom ? { [moveFrom]: { backgroundColor: "rgba(255, 255, 0, 0.5)" } } : {},
-                  darkSquareStyle: { backgroundColor: "#779556" },
-                  lightSquareStyle: { backgroundColor: "#ebecd0" },
-                  animationDurationInMs: 200,
+                  squareStyles: moveFrom ? { [moveFrom]: { backgroundColor: "rgba(14, 165, 233, 0.5)", boxShadow: "inset 0 0 15px rgba(14, 165, 233, 0.8)" } } : {},
+                  darkSquareStyle: { backgroundColor: "#1e1b4b" },
+                  lightSquareStyle: { backgroundColor: "#f0f9ff" },
+                  dropSquareStyle: { boxShadow: "inset 0 0 1px 6px rgba(14, 165, 233, 0.5)" },
+                  animationDurationInMs: 250,
                   allowDragging: gameState === 0 && !pendingPromotion
                 }}
               />

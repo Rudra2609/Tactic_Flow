@@ -269,6 +269,21 @@ function App() {
     }
   };
 
+  const handleQuitGame = () => {
+    if (gameState === 0 && !window.confirm("Are you sure you want to end the game?")) {
+      return;
+    }
+    
+    // Clean up online room if quitting an active online match
+    if (gameMode === "online" && dbRef.current) {
+      remove(dbRef.current);
+    }
+    
+    setRoomId(null);
+    setShowLobbyModal(false);
+    handleStartGame("menu");
+  };
+
   const triggerAIMove = (mod) => {
     try {
       if (mod.getGameState() !== 0) return;
@@ -752,14 +767,14 @@ function App() {
                 </div>
               </div>
             )}
-            <button onClick={() => handleStartGame("menu")} className="btn back-btn">End Game</button>
+            <button onClick={handleQuitGame} className="btn back-btn">End Game</button>
           </div>
           <div className="board-wrapper" style={{ position: 'relative' }}>
             {gameState !== 0 && (
               <div className="board-overlay">
                 <h2>Game Over</h2>
                 <p>{status}</p>
-                <button onClick={() => handleStartGame("menu")} className="btn">Back to Menu</button>
+                <button onClick={handleQuitGame} className="btn">Back to Menu</button>
               </div>
             )}
             <div className="board-container">

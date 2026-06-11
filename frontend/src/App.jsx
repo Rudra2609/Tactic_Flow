@@ -519,8 +519,8 @@ function App() {
                   position: fen,
                   onSquareClick: onEditorSquareClick,
                   onPieceDrop: onEditorPieceDrop,
-                  darkSquareStyle: { backgroundColor: "#779556" },
-                  lightSquareStyle: { backgroundColor: "#ebecd0" },
+                  darkSquareStyle: { backgroundColor: "#312e81" },
+                  lightSquareStyle: { backgroundColor: "#94a3b8" },
                   animationDurationInMs: 0,
                   allowDragging: true,
                   allowDragOffBoard: true
@@ -578,8 +578,8 @@ function App() {
                   onSquareClick: onGameSquareClick,
                   boardOrientation: gameMode === "ai" && elo === 3200 ? "black" : "white",
                   squareStyles: moveFrom ? { [moveFrom]: { backgroundColor: "rgba(14, 165, 233, 0.5)", boxShadow: "inset 0 0 15px rgba(14, 165, 233, 0.8)" } } : {},
-                  darkSquareStyle: { backgroundColor: "#1e1b4b" },
-                  lightSquareStyle: { backgroundColor: "#f0f9ff" },
+                  darkSquareStyle: { backgroundColor: "#312e81" },
+                  lightSquareStyle: { backgroundColor: "#94a3b8" },
                   dropSquareStyle: { boxShadow: "inset 0 0 1px 6px rgba(14, 165, 233, 0.5)" },
                   animationDurationInMs: 250,
                   allowDragging: gameState === 0 && !pendingPromotion

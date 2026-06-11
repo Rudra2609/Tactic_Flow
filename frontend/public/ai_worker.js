@@ -2,7 +2,7 @@ importScripts('chess_module.js');
 
 let wasmModule = null;
 
-Module().then(mod => {
+chess_module().then(mod => {
     wasmModule = mod;
     postMessage({ type: 'ready' });
 });

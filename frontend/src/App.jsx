@@ -61,7 +61,6 @@ function App() {
   const [timeControl, setTimeControl] = useState({ minutes: 10, increment: 0 });
   const [whiteTime, setWhiteTime] = useState(600);
   const [blackTime, setBlackTime] = useState(600);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const historyContainerRef = useRef(null);
   const [moveFrom, setMoveFrom] = useState(null);
   const [playerColor, setPlayerColor] = useState("white");

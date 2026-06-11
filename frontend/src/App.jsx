@@ -729,22 +729,6 @@ function App() {
         </div>
       ) : gameMode === "editor" ? (
         <div className="game-container">
-          <div className="board-wrapper">
-            <div className="board-container">
-              <Chessboard 
-                options={{
-                  position: fen,
-                  onSquareClick: onEditorSquareClick,
-                  onPieceDrop: onEditorPieceDrop,
-                  darkSquareStyle: { backgroundColor: "#312e81" },
-                  lightSquareStyle: { backgroundColor: "#94a3b8" },
-                  animationDurationInMs: 0,
-                  allowDragging: true,
-                  allowDragOffBoard: true
-                }}
-              />
-            </div>
-          </div>
           <div className="sidebar editor-sidebar">
             <h2 className="title-small">Board Editor</h2>
             <div className="editor-controls">
@@ -787,6 +771,22 @@ function App() {
                 <button className="btn ai-btn" onClick={() => validateAndPlayEditor("ai")}>Play vs AI</button>
                 <button className="btn" onClick={() => setGameMode("menu")}>Back to Menu</button>
               </div>
+            </div>
+          </div>
+          <div className="board-wrapper">
+            <div className="board-container">
+              <Chessboard 
+                options={{
+                  position: fen,
+                  onSquareClick: onEditorSquareClick,
+                  onPieceDrop: onEditorPieceDrop,
+                  darkSquareStyle: { backgroundColor: "#312e81" },
+                  lightSquareStyle: { backgroundColor: "#94a3b8" },
+                  animationDurationInMs: 0,
+                  allowDragging: true,
+                  allowDragOffBoard: true
+                }}
+              />
             </div>
           </div>
         </div>

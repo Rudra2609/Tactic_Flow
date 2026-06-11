@@ -814,7 +814,8 @@ body {
   .board-container {
     max-width: 100%;
     width: 100%;
-    aspect-ratio: 1;
+    height: 90vw;
+    max-height: 800px;
   }
 
   .board-wrapper {
@@ -824,10 +825,15 @@ body {
     min-height: min-content;
   }
 
-  .sidebar {
+  .sidebar, .history-sidebar {
     width: 100%;
     min-width: 0;
     padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .history-sidebar {
+    max-height: 50vh;
   }
 
   .title {

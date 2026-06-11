@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+import Auth from './Auth';
 import './App.css';
 
 function getPieceAt(fen, x, y) {
@@ -21,6 +24,8 @@ function getPieceAt(fen, x, y) {
 }
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [gameMode, setGameMode] = useState("menu"); // menu, pvp, ai, editor
   const [fen, setFen] = useState("start");
   const [elo, setElo] = useState(250);
@@ -63,6 +68,13 @@ function App() {
       }
     };
     initWasm();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Timer Interval
@@ -396,11 +408,17 @@ function App() {
     });
   }
 
+  if (authLoading) return <div className="app-background"><p className="status-text">Loading...</p></div>;
+  if (!user) return <Auth onAuthSuccess={() => {}} />;
+
   return (
     <div className="app-background">
       {gameMode === "menu" ? (
         <div className="menu-container">
-          <h1 className="title">Advance Chess</h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h1 className="title" style={{ marginBottom: 0 }}>Advance Chess</h1>
+            <button className="btn" style={{ padding: '8px 16px', fontSize: '0.9rem', background: '#334155' }} onClick={() => signOut(auth)}>Log Out</button>
+          </div>
           <div className="menu-card">
             <p className="status-text">{status}</p>
             
@@ -510,11 +528,11 @@ function App() {
             
             <div className="clocks-container">
               <div className={`clock ${wasmModule && wasmModule.getTurn() === 1 ? 'active' : ''}`}>
-                <span className="clock-label">Black</span>
+                <span className="clock-label">{gameMode === "ai" ? "AI" : "Black"}</span>
                 <span className="clock-time">{formatTime(blackTime)}</span>
               </div>
               <div className={`clock ${wasmModule && wasmModule.getTurn() === 0 ? 'active' : ''}`}>
-                <span className="clock-label">White</span>
+                <span className="clock-label">{user?.displayName || "Player"} (White)</span>
                 <span className="clock-time">{formatTime(whiteTime)}</span>
               </div>
             </div>

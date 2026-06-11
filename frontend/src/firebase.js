@@ -5,6 +5,7 @@ import { getDatabase } from "firebase/database";
 const firebaseConfig = {
   apiKey: "AIzaSyBIIvd9saVvYFY7083rOKTO0YFXZPZs6t4",
   authDomain: "chessx-2609.firebaseapp.com",
+  databaseURL: "https://chessx-2609-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "chessx-2609",
   storageBucket: "chessx-2609.firebasestorage.app",
   messagingSenderId: "772061404867",

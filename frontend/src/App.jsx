@@ -417,12 +417,11 @@ function App() {
         <div className="menu-container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h1 className="title" style={{ marginBottom: 0 }}>Tactic Flow</h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px 6px 16px', borderRadius: '100px', border: '1px solid rgba(255, 255, 255, 0.05)', boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)' }}>
-              <span style={{ color: 'var(--text-sub)', fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.5px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: 'var(--text-sub)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
                 {user?.displayName || user?.email?.split('@')[0]}
               </span>
-              <div style={{ width: '1px', height: '14px', background: 'rgba(255, 255, 255, 0.1)' }}></div>
-              <button style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', color: '#f43f5e', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', padding: '4px 12px', borderRadius: '100px', transition: 'all 0.2s ease' }} onClick={() => signOut(auth)} onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(244, 63, 94, 0.2)' }} onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(244, 63, 94, 0.1)' }}>
+              <button className="btn" style={{ padding: '6px 20px', fontSize: '0.85rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '12px' }} onClick={() => signOut(auth)}>
                 Log Out
               </button>
             </div>

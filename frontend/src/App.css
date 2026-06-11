@@ -203,12 +203,16 @@ body {
 }
 
 .board-container {
-  width: 100%;
-  max-width: 85vh; /* Max height bound */
+  width: 75vh; /* Explicit width based on screen height */
+  max-width: 100%; /* Don't overflow the wrapper */
+  aspect-ratio: 1; /* Force square ratio */
   border-radius: 12px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(14, 165, 233, 0.2);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .board-wrapper {
@@ -216,6 +220,7 @@ body {
   justify-content: center;
   align-items: center;
   flex: 1;
+  width: 100%;
   padding: 0 2rem;
 }
 

@@ -190,22 +190,22 @@ body {
 
 .game-container {
   display: flex;
-  gap: 4rem;
+  gap: 2rem;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   animation: slideIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  padding: 2rem 4rem;
+  padding: 2rem;
   width: 100%;
-  max-width: 100%;
+  max-width: 1600px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
 .board-container {
-  width: 75vh; /* Explicit width based on screen height */
-  max-width: 100%; /* Don't overflow the wrapper */
-  aspect-ratio: 1; /* Force square ratio */
+  width: 100%;
+  max-width: 80vh; /* Max height limit */
+  aspect-ratio: 1; /* Keep it perfectly square */
   border-radius: 12px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(14, 165, 233, 0.2);
   overflow: hidden;
@@ -219,18 +219,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 1;
-  width: 100%;
-  padding: 0 2rem;
+  flex: 1 1 0; /* Grow and shrink safely */
+  min-width: 0; /* Prevents flex blowout */
+  padding: 0;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 24px;
-  width: 350px;
+  width: 320px;
   flex-shrink: 0;
   background: var(--bg-card);
   backdrop-filter: blur(24px);
@@ -300,7 +300,7 @@ body {
 }
 
 .history-sidebar {
-  width: 350px;
+  width: 320px;
   flex-shrink: 0;
   background: var(--bg-card);
   backdrop-filter: blur(24px);
@@ -308,10 +308,10 @@ body {
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-  padding: 2.5rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  max-height: 85vh;
+  max-height: 80vh;
 }
 
 .history-title {

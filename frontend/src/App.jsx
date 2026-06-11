@@ -680,7 +680,7 @@ function App() {
                 {piecesArray.map(p => (
                   <button 
                     key={p.id} 
-                    className={`palette-btn ${editorPiece === p.id ? 'selected' : ''}`}
+                    className={`piece-option ${editorPiece === p.id ? 'selected' : ''}`}
                     onClick={() => setEditorPiece(p.id)}
                   >
                     {p.icon}
@@ -690,7 +690,7 @@ function App() {
               
               <div className="turn-toggle">
                 <label>Side to move: </label>
-                <select value={editorTurn} onChange={(e) => handleEditorTurnToggle(e.target.value)}>
+                <select className="editor-select" value={editorTurn} onChange={(e) => handleEditorTurnToggle(e.target.value)}>
                   <option value="w">White</option>
                   <option value="b">Black</option>
                 </select>

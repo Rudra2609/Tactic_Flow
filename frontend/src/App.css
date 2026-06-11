@@ -545,6 +545,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 2.5rem; /* Make unicode pieces much larger */
+  color: #fff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -561,7 +563,30 @@ body {
 }
 
 .eraser {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  color: #f43f5e;
+}
+
+.fen-input, .editor-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  box-sizing: border-box;
+}
+
+.fen-input:focus, .editor-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
+
+.fen-input {
+  margin-bottom: 1.5rem;
 }
 
 .promotion-modal {

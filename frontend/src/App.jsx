@@ -21,13 +21,17 @@ function getPieceAt(fen, x, y) {
 }
 
 function App() {
+  const [gameMode, setGameMode] = useState("menu"); // menu, pvp, ai, editor
   const [fen, setFen] = useState("start");
-  const [gameMode, setGameMode] = useState("menu");
   const [elo, setElo] = useState(1200);
   const [wasmModule, setWasmModule] = useState(null);
   const [status, setStatus] = useState("Loading engine...");
   const [gameState, setGameState] = useState(0); // 0=Ongoing, 1=Checkmate, 2=Stalemate, 3=Draw50, 4=DrawRep, 5=InsufficientMaterial, 6=Timeout, 7=TimeoutvsInsufficient
   const [pendingPromotion, setPendingPromotion] = useState(null);
+
+  // Editor states
+  const [editorPiece, setEditorPiece] = useState('wP');
+  const [editorTurn, setEditorTurn] = useState('w');
 
   // Time control states
   const [timeControl, setTimeControl] = useState({ minutes: 10, increment: 0 });
@@ -100,6 +104,14 @@ function App() {
       alert("Engine not loaded yet!");
       return;
     }
+    
+    if (mode === "editor") {
+      setGameMode("editor");
+      chess.clear(); // Empty board for editor
+      setFen(chess.fen());
+      return;
+    }
+
     wasmModule.initBoard();
     chess.reset();
     setFen(wasmModule.getBoardState());
@@ -215,6 +227,109 @@ function App() {
     setPendingPromotion(null);
   };
 
+  const onEditorSquareClick = (square) => {
+    if (editorPiece === 'eraser') {
+      chess.remove(square);
+    } else {
+      chess.put({ type: editorPiece[1].toLowerCase(), color: editorPiece[0] }, square);
+    }
+    const fenParts = chess.fen().split(' ');
+    fenParts[1] = editorTurn;
+    setFen(fenParts.join(' '));
+  };
+
+  const onEditorPieceDrop = (sourceSquare, targetSquare) => {
+    const p = chess.remove(sourceSquare);
+    if (p) {
+      chess.put(p, targetSquare);
+      const fenParts = chess.fen().split(' ');
+      fenParts[1] = editorTurn;
+      setFen(fenParts.join(' '));
+      return true;
+    }
+    return false;
+  };
+
+  const handleEditorTurnToggle = (turn) => {
+    setEditorTurn(turn);
+    const fenParts = fen.split(' ');
+    fenParts[1] = turn;
+    setFen(fenParts.join(' '));
+    try { chess.load(fenParts.join(' ')); } catch(e){}
+  };
+
+  const validateAndPlayEditor = () => {
+    let wKings = 0, bKings = 0;
+    const boardArr = chess.board();
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const sq = boardArr[r][c];
+        if (sq && sq.type === 'k') {
+          if (sq.color === 'w') wKings++;
+          else bKings++;
+        }
+      }
+    }
+    if (wKings !== 1 || bKings !== 1) {
+      alert("Board must have exactly one White King and one Black King.");
+      return;
+    }
+
+    const fenBoard = fen.split(' ')[0];
+    const rows = fenBoard.split('/');
+    if (rows[0].includes('P') || rows[0].includes('p') || rows[7].includes('P') || rows[7].includes('p')) {
+      alert("Pawns cannot be on the 1st or 8th rank.");
+      return;
+    }
+
+    const oppTurn = editorTurn === 'w' ? 'b' : 'w';
+    const fenParts = fen.split(' ');
+    fenParts[1] = oppTurn;
+    try {
+      const tempChess = new Chess(fenParts.join(' '));
+      if (tempChess.isCheck()) {
+        alert("Invalid position: The side not to move is in check.");
+        return;
+      }
+    } catch(e) {}
+
+    let fullFen = fenParts.join(' ');
+    if (fenParts.length < 6) fullFen = `${fenParts[0]} ${fenParts[1]} ${fenParts[2] || '-'} ${fenParts[3] || '-'} 0 1`;
+    
+    const success = wasmModule.setBoardFromFEN(fullFen);
+    if (success) {
+      chess.load(fullFen);
+      setFen(fullFen);
+      setMoveHistory([]);
+      setGameMode("ai");
+      setGameState(0);
+      setPendingPromotion(null);
+      setWhiteTime(timeControl.minutes * 60);
+      setBlackTime(timeControl.minutes * 60);
+      setIsTimerRunning(true);
+      setStatus(editorTurn === 'w' ? "Your turn (White)" : "AI thinking...");
+      
+      if (editorTurn === 'b') {
+        setTimeout(() => {
+          const aiMoveStr = wasmModule.getBestMove(elo);
+          const parts = aiMoveStr.split(",");
+          if (parts.length === 4) {
+            const [aiFromX, aiFromY, aiToX, aiToY] = parts.map(Number);
+            executeMove(aiFromX, aiFromY, aiToX, aiToY, 1);
+          }
+        }, 50);
+      }
+    } else {
+      alert("WASM Engine rejected the FEN string.");
+    }
+  };
+
+  const piecesArray = [
+    { id: 'wK', icon: '♔' }, { id: 'wQ', icon: '♕' }, { id: 'wR', icon: '♖' }, { id: 'wB', icon: '♗' }, { id: 'wN', icon: '♘' }, { id: 'wP', icon: '♙' },
+    { id: 'bK', icon: '♚' }, { id: 'bQ', icon: '♛' }, { id: 'bR', icon: '♜' }, { id: 'bB', icon: '♝' }, { id: 'bN', icon: '♞' }, { id: 'bP', icon: '♟' },
+    { id: 'eraser', icon: '❌' }
+  ];
+
   const formatTime = (seconds) => {
     if (timeControl.minutes === 0) return "∞";
     const m = Math.floor(seconds / 60);
@@ -278,6 +393,70 @@ function App() {
                 className="slider"
               />
               <button className="btn ai-btn" onClick={() => handleStartGame("ai")}>Start vs AI</button>
+            </div>
+
+            <h2>Analysis Mode</h2>
+            <button className="btn" style={{background: '#3b82f6'}} onClick={() => handleStartGame("editor")}>Board Editor</button>
+          </div>
+        </div>
+      ) : gameMode === "editor" ? (
+        <div className="game-container">
+          <div className="sidebar editor-sidebar">
+            <h2 className="title-small">Board Editor</h2>
+            <div className="editor-controls">
+              <p>Select piece, then click square to place.</p>
+              <div className="piece-palette">
+                {piecesArray.map(p => (
+                  <button 
+                    key={p.id} 
+                    className={`palette-btn ${editorPiece === p.id ? 'selected' : ''}`}
+                    onClick={() => setEditorPiece(p.id)}
+                  >
+                    {p.icon}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="turn-toggle">
+                <label>Side to move: </label>
+                <select value={editorTurn} onChange={(e) => handleEditorTurnToggle(e.target.value)}>
+                  <option value="w">White</option>
+                  <option value="b">Black</option>
+                </select>
+              </div>
+
+              <div style={{marginTop: '20px'}}>
+                <label>FEN String:</label>
+                <input 
+                  type="text" 
+                  value={fen} 
+                  onChange={(e) => {
+                    setFen(e.target.value);
+                    try { chess.load(e.target.value); } catch(e){}
+                  }}
+                  className="fen-input"
+                />
+              </div>
+
+              <div className="editor-actions">
+                <button className="btn ai-btn" onClick={validateAndPlayEditor}>Play vs AI</button>
+                <button className="btn" onClick={() => setGameMode("menu")}>Back to Menu</button>
+              </div>
+            </div>
+          </div>
+          <div className="board-wrapper">
+            <div style={{ width: 600, height: 600 }}>
+              <Chessboard 
+                options={{
+                  position: fen,
+                  onSquareClick: onEditorSquareClick,
+                  onPieceDrop: onEditorPieceDrop,
+                  darkSquareStyle: { backgroundColor: "#779556" },
+                  lightSquareStyle: { backgroundColor: "#ebecd0" },
+                  animationDurationInMs: 0,
+                  arePiecesDraggable: true
+                }}
+              />
             </div>
           </div>
         </div>

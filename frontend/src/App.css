@@ -395,3 +395,77 @@ body {
 .black-piece {
   color: #cbd5e1;
 }
+
+/* Editor CSS */
+.editor-sidebar {
+  width: 300px;
+  min-width: 300px;
+}
+
+.editor-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.piece-palette {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.palette-btn {
+  background: transparent;
+  border: 2px solid transparent;
+  color: white;
+  font-size: 1.5rem;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.palette-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.palette-btn.selected {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.turn-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.turn-toggle select {
+  background: #334155;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.fen-input {
+  width: 100%;
+  padding: 8px;
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  font-family: monospace;
+  margin-top: 5px;
+}
+
+.editor-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}

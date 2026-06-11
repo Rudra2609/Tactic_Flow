@@ -452,7 +452,7 @@ function App() {
             </div>
           </div>
           <div className="board-wrapper">
-            <div style={{ width: 600, height: 600 }}>
+            <div className="board-container">
               <Chessboard 
                 options={{
                   position: fen,
@@ -509,7 +509,7 @@ function App() {
                 <button onClick={() => handleStartGame("menu")} className="btn">Back to Menu</button>
               </div>
             )}
-            <div style={{ width: 600, height: 600 }}>
+            <div className="board-container">
               <Chessboard 
                 options={{
                   position: fen,

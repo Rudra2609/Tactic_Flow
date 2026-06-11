@@ -611,9 +611,9 @@ function App() {
                 className="slider"
               />
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem', marginBottom: '1rem' }}>
-                <button className={`palette-btn ${playerColor === 'white' ? 'selected' : ''}`} onClick={() => setPlayerColor('white')}>♔ White</button>
-                <button className={`palette-btn ${playerColor === 'random' ? 'selected' : ''}`} onClick={() => setPlayerColor('random')}>? Random</button>
-                <button className={`palette-btn ${playerColor === 'black' ? 'selected' : ''}`} onClick={() => setPlayerColor('black')}>♚ Black</button>
+                <button className={`color-select-btn ${playerColor === 'white' ? 'selected' : ''}`} onClick={() => setPlayerColor('white')}>♔ White</button>
+                <button className={`color-select-btn ${playerColor === 'random' ? 'selected' : ''}`} onClick={() => setPlayerColor('random')}>? Random</button>
+                <button className={`color-select-btn ${playerColor === 'black' ? 'selected' : ''}`} onClick={() => setPlayerColor('black')}>♚ Black</button>
               </div>
               <button className="btn ai-btn" onClick={() => handleStartGame("ai")}>Start vs AI</button>
             </div>

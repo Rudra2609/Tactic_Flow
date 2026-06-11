@@ -497,18 +497,19 @@ function App() {
       return;
     }
 
-    const oppTurn = editorTurn === 'w' ? 'b' : 'w';
     const fenParts = fen.split(' ');
-    fenParts[1] = oppTurn;
+    const oppTurn = fenParts[1] === 'w' ? 'b' : 'w';
+    const testParts = [...fenParts];
+    testParts[1] = oppTurn;
     try {
-      const tempChess = new Chess(fenParts.join(' '));
+      const tempChess = new Chess(testParts.join(' '));
       if (tempChess.isCheck()) {
         alert("Invalid position: The side not to move is in check.");
         return;
       }
     } catch(e) {}
 
-    let fullFen = fenParts.join(' ');
+    let fullFen = fen;
     if (fenParts.length < 6) fullFen = `${fenParts[0]} ${fenParts[1]} ${fenParts[2] || '-'} ${fenParts[3] || '-'} 0 1`;
     
     const success = wasmModule.setBoardFromFEN(fullFen);
@@ -518,30 +519,42 @@ function App() {
       setMoveHistory([]);
       setGameMode("ai");
       setGameState(0);
-      setPendingPromotion(null);
+      
+      let chosenColor = playerColor;
+      if (chosenColor === "random") {
+        chosenColor = Math.random() < 0.5 ? "white" : "black";
+      }
+      setPlayerColor(chosenColor);
+      
+      const isAITurn = fenParts[1] === (chosenColor === "white" ? "b" : "w");
+      if (isAITurn) {
+        setStatus("AI thinking...");
+        setTimeout(() => triggerAIMove(wasmModule), 50);
+      } else {
+        setStatus(fenParts[1] === 'w' ? "White's turn" : "Black's turn");
+      }
       setWhiteTime(timeControl.minutes * 60);
       setBlackTime(timeControl.minutes * 60);
       setIsTimerRunning(true);
-      setStatus(editorTurn === 'w' ? "Your turn (White)" : "AI thinking...");
-      
-      if (editorTurn === 'b') {
-        setTimeout(() => {
-          const aiMoveStr = wasmModule.getBestMove(elo);
-          const parts = aiMoveStr.split(",");
-          if (parts.length === 4) {
-            const [aiFromX, aiFromY, aiToX, aiToY] = parts.map(Number);
-            executeMove(aiFromX, aiFromY, aiToX, aiToY, 1);
-          }
-        }, 50);
-      }
+      // AI Turn already triggered if needed above
     } else {
       alert("WASM Engine rejected the FEN string.");
     }
   };
 
   const piecesArray = [
-    { id: 'wK', icon: '♔' }, { id: 'wQ', icon: '♕' }, { id: 'wR', icon: '♖' }, { id: 'wB', icon: '♗' }, { id: 'wN', icon: '♘' }, { id: 'wP', icon: '♙' },
-    { id: 'bK', icon: '♚' }, { id: 'bQ', icon: '♛' }, { id: 'bR', icon: '♜' }, { id: 'bB', icon: '♝' }, { id: 'bN', icon: '♞' }, { id: 'bP', icon: '♟' },
+    { id: 'wK', icon: <img src="/pieces/wK.svg" alt="White King" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'wQ', icon: <img src="/pieces/wQ.svg" alt="White Queen" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'wR', icon: <img src="/pieces/wR.svg" alt="White Rook" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'wB', icon: <img src="/pieces/wB.svg" alt="White Bishop" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'wN', icon: <img src="/pieces/wN.svg" alt="White Knight" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'wP', icon: <img src="/pieces/wP.svg" alt="White Pawn" style={{width: '75%', height: '75%'}} /> },
+    { id: 'bK', icon: <img src="/pieces/bK.svg" alt="Black King" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'bQ', icon: <img src="/pieces/bQ.svg" alt="Black Queen" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'bR', icon: <img src="/pieces/bR.svg" alt="Black Rook" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'bB', icon: <img src="/pieces/bB.svg" alt="Black Bishop" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'bN', icon: <img src="/pieces/bN.svg" alt="Black Knight" style={{width: '75%', height: '75%'}} /> }, 
+    { id: 'bP', icon: <img src="/pieces/bP.svg" alt="Black Pawn" style={{width: '75%', height: '75%'}} /> },
     { id: 'eraser', icon: '❌' }
   ];
 
@@ -707,6 +720,22 @@ function App() {
                   }}
                   className="fen-input"
                 />
+              </div>
+
+              <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
+                <label>AI Difficulty (ELO): <strong>{elo}</strong></label>
+                <input 
+                  type="range" 
+                  min="250" max="3200" step="50"
+                  value={elo} 
+                  onChange={(e) => setElo(parseInt(e.target.value))}
+                  className="slider"
+                />
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', marginBottom: '1rem' }}>
+                  <button className={`color-select-btn ${playerColor === 'white' ? 'selected' : ''}`} style={{fontSize: '0.8rem', padding: '6px'}} onClick={() => setPlayerColor('white')}>♔ White</button>
+                  <button className={`color-select-btn ${playerColor === 'random' ? 'selected' : ''}`} style={{fontSize: '0.8rem', padding: '6px'}} onClick={() => setPlayerColor('random')}>? Random</button>
+                  <button className={`color-select-btn ${playerColor === 'black' ? 'selected' : ''}`} style={{fontSize: '0.8rem', padding: '6px'}} onClick={() => setPlayerColor('black')}>♚ Black</button>
+                </div>
               </div>
 
               <div className="editor-actions">

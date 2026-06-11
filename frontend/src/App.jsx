@@ -417,14 +417,14 @@ function App() {
         <div className="menu-container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h1 className="title" style={{ marginBottom: 0 }}>Tactic Flow</h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '800', fontSize: '1.1rem', boxShadow: '0 4px 10px rgba(14, 165, 233, 0.3)' }}>
-                  {(user?.displayName || user?.email || 'U')[0].toUpperCase()}
-                </div>
-                <span style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: 600, letterSpacing: '0.5px' }}>{user?.displayName || user?.email?.split('@')[0]}</span>
-              </div>
-              <button className="btn" style={{ padding: '8px 16px', fontSize: '0.9rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)' }} onClick={() => signOut(auth)}>Log Out</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255, 255, 255, 0.03)', padding: '6px 8px 6px 16px', borderRadius: '100px', border: '1px solid rgba(255, 255, 255, 0.05)', boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)' }}>
+              <span style={{ color: 'var(--text-sub)', fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.5px' }}>
+                {user?.displayName || user?.email?.split('@')[0]}
+              </span>
+              <div style={{ width: '1px', height: '14px', background: 'rgba(255, 255, 255, 0.1)' }}></div>
+              <button style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', color: '#f43f5e', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', padding: '4px 12px', borderRadius: '100px', transition: 'all 0.2s ease' }} onClick={() => signOut(auth)} onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(244, 63, 94, 0.2)' }} onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(244, 63, 94, 0.1)' }}>
+                Log Out
+              </button>
             </div>
           </div>
           <div className="menu-card">

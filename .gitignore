@@ -1,0 +1,7 @@
+emsdk/
+frontend/node_modules/
+frontend/dist/
+*.exe
+*.o
+*.obj
+chess

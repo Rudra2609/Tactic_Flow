@@ -1,12 +1,12 @@
 #include <iostream>
 #include <string>
 #include <limits>
-#include "chess.h"
+#include "Game.h"
 
 using namespace std;
 
 int main() {
-    Board b;
+    Game g;
     string s;
     bool newgame = true;
 
@@ -22,8 +22,7 @@ int main() {
     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     while (newgame) {
-        b.setBoard();
-        b.playGame();
+        g.playGame();
 
         cout << "Do you want to play again? (y for yes, anything else for no): ";
         cin >> s;

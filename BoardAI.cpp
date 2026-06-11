@@ -35,6 +35,7 @@ bool Board::makeMoveAI(const Move& m) {
     Square* to = &board[m.toX][m.toY];
     Piece movingPiece = from->getPiece();
     Color movingColor = from->getColor();
+    Piece capturedPiece = to->getPiece();
 
     std::pair<int, int> previousEnPassantTarget = enPassantTarget;
     enPassantTarget = {-1, -1};
@@ -68,7 +69,46 @@ bool Board::makeMoveAI(const Move& m) {
         to->setPieceAndColor(m.promotion == EMPTY ? QUEEN : m.promotion, movingColor, true);
     }
 
+    // Update castling rights
+    if (movingPiece == KING) {
+        if (movingColor == WHITE) {
+            whiteCanCastleKingside = false;
+            whiteCanCastleQueenside = false;
+        } else {
+            blackCanCastleKingside = false;
+            blackCanCastleQueenside = false;
+        }
+    } else if (movingPiece == ROOK) {
+        if (movingColor == WHITE) {
+            if (m.fromX == 7 && m.fromY == 7) whiteCanCastleKingside = false;
+            if (m.fromX == 7 && m.fromY == 0) whiteCanCastleQueenside = false;
+        } else {
+            if (m.fromX == 0 && m.fromY == 7) blackCanCastleKingside = false;
+            if (m.fromX == 0 && m.fromY == 0) blackCanCastleQueenside = false;
+        }
+    }
+    // Check if captured piece was a rook that hadn't moved, to revoke opponent's castling rights
+    if (to->getPiece() == ROOK) {
+        if (m.toX == 7 && m.toY == 7) whiteCanCastleKingside = false;
+        if (m.toX == 7 && m.toY == 0) whiteCanCastleQueenside = false;
+        if (m.toX == 0 && m.toY == 7) blackCanCastleKingside = false;
+        if (m.toX == 0 && m.toY == 0) blackCanCastleQueenside = false;
+    }
+
+    // Update 50-move rule clock
+    if (movingPiece == PAWN || capturedPiece != EMPTY) {
+        halfMoveClock = 0;
+    } else {
+        halfMoveClock++;
+    }
+
+    // Update full move number
+    if (turn == BLACK) {
+        fullMoveNumber++;
+    }
+
     turn = opposite(turn);
+    positionHistory.push_back(generatePositionString());
     return true;
 }
 

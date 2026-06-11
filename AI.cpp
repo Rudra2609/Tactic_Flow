@@ -8,10 +8,10 @@ AI::AI(int eloRating) {
 
 void AI::setElo(int eloRating) {
     elo = eloRating;
-    if (elo <= 800) maxDepth = 1;
-    else if (elo <= 1200) maxDepth = 2;
-    else if (elo <= 1600) maxDepth = 3;
-    else if (elo <= 2000) maxDepth = 4;
+    if (elo <= 600) maxDepth = 1;
+    else if (elo <= 1000) maxDepth = 2;
+    else if (elo <= 1500) maxDepth = 3;
+    else if (elo <= 2200) maxDepth = 4;
     else maxDepth = 5;
 }
 
@@ -64,7 +64,22 @@ Move AI::getBestMove(const Board& b) {
         return Move(); // No moves
     }
 
-    if (elo < 1200 && (rand() % 100 < 30)) {
+    // Shuffle legal moves to prevent the AI from always playing the exact same opening game
+    for (size_t i = 0; i < legalMoves.size(); ++i) {
+        size_t j = i + rand() % (legalMoves.size() - i);
+        std::swap(legalMoves[i], legalMoves[j]);
+    }
+
+    // Calculate a dynamic blunder probability based on ELO
+    // At ELO 250, 70% chance to play a random move
+    // At ELO 1500, 0% chance to play a random move
+    int blunderChance = 0;
+    if (elo < 1500) {
+        blunderChance = 70 - ((elo - 250) * 70 / 1250);
+        if (blunderChance < 0) blunderChance = 0;
+    }
+
+    if (rand() % 100 < blunderChance) {
         return legalMoves[rand() % legalMoves.size()];
     }
 

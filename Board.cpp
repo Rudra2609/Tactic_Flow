@@ -1,6 +1,8 @@
 #include "Board.h"
 #include <iostream>
 #include <cmath>
+#include <sstream>
+#include <cctype>
 
 Color Board::opposite(Color c) const {
     return (c == WHITE) ? BLACK : WHITE;
@@ -218,6 +220,14 @@ bool Board::isValidCastling(int fromX, int fromY, int toX, int toY, bool checkCh
 
     Color kingColor = board[fromX][fromY].getColor();
 
+    if (kingColor == WHITE) {
+        if (toY > fromY && !whiteCanCastleKingside) return false;
+        if (toY < fromY && !whiteCanCastleQueenside) return false;
+    } else {
+        if (toY > fromY && !blackCanCastleKingside) return false;
+        if (toY < fromY && !blackCanCastleQueenside) return false;
+    }
+
     if (checkCheckConstraints && isInCheck(kingColor)) {
          return false;
     }
@@ -363,6 +373,73 @@ bool Board::isStalemate(Color playerColor) {
     return true;
 }
 
+bool Board::setBoardFromFEN(const std::string& fen) {
+    std::istringstream iss(fen);
+    std::string boardPart, activeColorPart, castlingPart, enPassantPart, halfMovePart, fullMovePart;
+    iss >> boardPart >> activeColorPart >> castlingPart >> enPassantPart >> halfMovePart >> fullMovePart;
+
+    if (boardPart.empty()) return false;
+
+    // Clear board
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            board[i][j].setPieceAndColor(EMPTY, NONE);
+        }
+    }
+
+    int row = 0, col = 0;
+    for (char c : boardPart) {
+        if (c == '/') {
+            row++;
+            col = 0;
+        } else if (isdigit(c)) {
+            col += (c - '0');
+        } else {
+            Color color = isupper(c) ? WHITE : BLACK;
+            Piece piece = EMPTY;
+            char lower = tolower(c);
+            if (lower == 'p') piece = PAWN;
+            else if (lower == 'n') piece = KNIGHT;
+            else if (lower == 'b') piece = BISHOP;
+            else if (lower == 'r') piece = ROOK;
+            else if (lower == 'q') piece = QUEEN;
+            else if (lower == 'k') piece = KING;
+            
+            if (row < 8 && col < 8 && piece != EMPTY) {
+                board[row][col].setPieceAndColor(piece, color);
+                col++;
+            }
+        }
+    }
+
+    if (activeColorPart == "b") turn = BLACK;
+    else turn = WHITE;
+
+    whiteCanCastleKingside = (castlingPart.find('K') != std::string::npos);
+    whiteCanCastleQueenside = (castlingPart.find('Q') != std::string::npos);
+    blackCanCastleKingside = (castlingPart.find('k') != std::string::npos);
+    blackCanCastleQueenside = (castlingPart.find('q') != std::string::npos);
+
+    if (enPassantPart != "-" && enPassantPart.length() == 2) {
+        int epCol = enPassantPart[0] - 'a';
+        int epRow = 8 - (enPassantPart[1] - '0');
+        enPassantTarget = {epRow, epCol};
+    } else {
+        enPassantTarget = {-1, -1};
+    }
+
+    if (!halfMovePart.empty()) halfMoveClock = std::stoi(halfMovePart);
+    else halfMoveClock = 0;
+
+    if (!fullMovePart.empty()) fullMoveNumber = std::stoi(fullMovePart);
+    else fullMoveNumber = 1;
+
+    positionHistory.clear();
+    positionHistory.push_back(generatePositionString());
+    
+    return true;
+}
+
 Board::Board() {
     setBoard();
 }
@@ -402,6 +479,14 @@ void Board::setBoard() {
 
     turn = WHITE;
     enPassantTarget = {-1, -1};
+    halfMoveClock = 0;
+    fullMoveNumber = 1;
+    whiteCanCastleKingside = true;
+    whiteCanCastleQueenside = true;
+    blackCanCastleKingside = true;
+    blackCanCastleQueenside = true;
+    positionHistory.clear();
+    positionHistory.push_back(generatePositionString());
 }
 
 void Board::printBoard() const {
@@ -509,4 +594,165 @@ bool Board::makeMove(int fromX, int fromY, int toX, int toY) {
     }
 
     return true;
+}
+
+std::string Board::generatePositionString() const {
+    std::string fen = "";
+    for (int i = 0; i < 8; ++i) {
+        int emptyCount = 0;
+        for (int j = 0; j < 8; ++j) {
+            Piece p = board[i][j].getPiece();
+            if (p == EMPTY) {
+                emptyCount++;
+            } else {
+                if (emptyCount > 0) {
+                    fen += std::to_string(emptyCount);
+                    emptyCount = 0;
+                }
+                Color c = board[i][j].getColor();
+                char symbol = '.';
+                switch (p) {
+                    case KING:   symbol = 'k'; break;
+                    case QUEEN:  symbol = 'q'; break;
+                    case BISHOP: symbol = 'b'; break;
+                    case KNIGHT: symbol = 'n'; break;
+                    case ROOK:   symbol = 'r'; break;
+                    case PAWN:   symbol = 'p'; break;
+                    default: break;
+                }
+                if (c == WHITE) symbol = toupper(symbol);
+                fen += symbol;
+            }
+        }
+        if (emptyCount > 0) {
+            fen += std::to_string(emptyCount);
+        }
+        if (i < 7) fen += "/";
+    }
+    fen += (turn == WHITE) ? " w " : " b ";
+    
+    std::string castling = "";
+    if (whiteCanCastleKingside) castling += "K";
+    if (whiteCanCastleQueenside) castling += "Q";
+    if (blackCanCastleKingside) castling += "k";
+    if (blackCanCastleQueenside) castling += "q";
+    if (castling.empty()) castling = "-";
+    fen += castling + " ";
+
+    if (enPassantTarget.first != -1) {
+        char file = 'a' + enPassantTarget.second;
+        char rank = '8' - enPassantTarget.first;
+        fen += file;
+        fen += rank;
+    } else {
+        fen += "-";
+    }
+
+    return fen;
+}
+
+bool Board::isDrawByFiftyMoveRule() const {
+    return halfMoveClock >= 100;
+}
+
+bool Board::isDrawByRepetition() const {
+    int count = 0;
+    std::string currentPos = generatePositionString();
+    for (const std::string& pos : positionHistory) {
+        if (pos == currentPos) {
+            count++;
+            if (count >= 3) return true;
+        }
+    }
+    return false;
+}
+
+int Board::getGameState() {
+    if (isCheckmate(turn)) return 1;
+    if (isStalemate(turn)) return 2;
+    if (isDrawByFiftyMoveRule()) return 3;
+    if (isDrawByRepetition()) return 4;
+    if (isInsufficientMaterial()) return 5;
+    return 0;
+}
+
+bool Board::hasMatingMaterial(Color c) const {
+    int knightCount = 0;
+    int bishopCount = 0;
+    int pawnCount = 0;
+    int rookCount = 0;
+    int queenCount = 0;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (board[i][j].getColor() == c) {
+                Piece p = board[i][j].getPiece();
+                if (p == PAWN) pawnCount++;
+                else if (p == KNIGHT) knightCount++;
+                else if (p == BISHOP) bishopCount++;
+                else if (p == ROOK) rookCount++;
+                else if (p == QUEEN) queenCount++;
+            }
+        }
+    }
+
+    if (pawnCount > 0 || rookCount > 0 || queenCount > 0) return true;
+    if (knightCount >= 2) return true; 
+    if (knightCount > 0 && bishopCount > 0) return true;
+    if (bishopCount >= 2) return true; 
+    
+    return false;
+}
+
+bool Board::isInsufficientMaterial() const {
+    int whitePieces = 0;
+    int blackPieces = 0;
+    int whiteBishopsLight = 0;
+    int whiteBishopsDark = 0;
+    int blackBishopsLight = 0;
+    int blackBishopsDark = 0;
+    int whiteKnights = 0;
+    int blackKnights = 0;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Piece p = board[i][j].getPiece();
+            if (p != EMPTY && p != KING) {
+                Color c = board[i][j].getColor();
+                if (c == WHITE) {
+                    whitePieces++;
+                    if (p == BISHOP) {
+                        if ((i + j) % 2 == 0) whiteBishopsLight++;
+                        else whiteBishopsDark++;
+                    } else if (p == KNIGHT) {
+                        whiteKnights++;
+                    } else {
+                        return false; 
+                    }
+                } else {
+                    blackPieces++;
+                    if (p == BISHOP) {
+                        if ((i + j) % 2 == 0) blackBishopsLight++;
+                        else blackBishopsDark++;
+                    } else if (p == KNIGHT) {
+                        blackKnights++;
+                    } else {
+                        return false; 
+                    }
+                }
+            }
+        }
+    }
+
+    if (whitePieces == 0 && blackPieces == 0) return true;
+    if (whitePieces == 1 && whiteKnights == 1 && blackPieces == 0) return true;
+    if (blackPieces == 1 && blackKnights == 1 && whitePieces == 0) return true;
+    if (whitePieces == 1 && (whiteBishopsLight == 1 || whiteBishopsDark == 1) && blackPieces == 0) return true;
+    if (blackPieces == 1 && (blackBishopsLight == 1 || blackBishopsDark == 1) && whitePieces == 0) return true;
+    if (whitePieces == 1 && blackPieces == 1) {
+        if (whiteBishopsLight == 1 && blackBishopsLight == 1) return true;
+        if (whiteBishopsDark == 1 && blackBishopsDark == 1) return true;
+    }
+
+    return false;
 }

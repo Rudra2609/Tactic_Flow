@@ -35,7 +35,6 @@
 - [AI Engine Deep Dive](#-ai-engine-deep-dive)
 - [Firebase Setup](#-firebase-setup)
 - [Deployment](#-deployment)
-- [Contributing](#-contributing)
 - [License](#-license)
 
 ---

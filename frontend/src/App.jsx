@@ -47,7 +47,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [gameMode, setGameMode] = useState("menu"); // menu, pvp, ai, editor
   const [fen, setFen] = useState("start");
-  const [elo, setElo] = useState(250);
+  const [elo, setElo] = useState(3200);
   const [wasmModule, setWasmModule] = useState(null);
   const [status, setStatus] = useState("Waiting to start...");
   const [gameState, setGameState] = useState(0); // 0=playing, 1=checkmate, 2=stalemate, etc., 6=resign, 7=draw agreement

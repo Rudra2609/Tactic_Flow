@@ -709,7 +709,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.5rem; /* Make unicode pieces much larger */
+  font-size: 4.5rem; /* Make unicode pieces much larger */
   color: #fff;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -727,7 +727,7 @@ body {
 }
 
 .eraser {
-  font-size: 2.5rem;
+  font-size: 4.5rem;
   color: #f43f5e;
 }
 

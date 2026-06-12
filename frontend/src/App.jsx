@@ -742,7 +742,7 @@ function App() {
             </div>
 
             <h2>Analysis Mode</h2>
-            <button className="btn" style={{background: '#3b82f6'}} onClick={() => handleStartGame("editor")}>Board Editor</button>
+            <button className="btn" style={{background: '#3b82f6'}} onClick={() => handleStartGame("editor")}>Custom Setup</button>
             
             <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--text-sub)', fontSize: '0.9rem' }}>
@@ -757,7 +757,7 @@ function App() {
       ) : gameMode === "editor" ? (
         <div className="game-container">
           <div className="sidebar editor-sidebar">
-            <h2 className="title-small">Board Editor</h2>
+            <h2 className="title-small">Custom Setup</h2>
             <div className="editor-controls">
               <p>Select piece, then click square to place.</p>
               <div className="piece-palette">

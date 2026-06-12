@@ -33,7 +33,7 @@ function App() {
 
   // Initialize Web Worker for AI
   useEffect(() => {
-    aiWorkerRef.current = new Worker('/ai_worker.js');
+    aiWorkerRef.current = new Worker(import.meta.env.BASE_URL + 'ai_worker.js');
     aiWorkerRef.current.onmessage = (e) => {
       if (e.data.type === 'result' && resolveAIMove.current) {
         resolveAIMove.current(e.data.move);

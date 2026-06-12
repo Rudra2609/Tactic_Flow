@@ -2,8 +2,10 @@
 #define BOARD_H
 
 #include "Square.h"
-#include <utility>
+#include "Common.h"
 #include <vector>
+#include <string>
+#include <utility>
 
 class Board {
 public:

@@ -1,31 +1,36 @@
 # Tactic Flow ♟️
 
-Welcome to **Tactic Flow**, a high-performance, modern web-based chess engine and application.
+Welcome to **Tactic Flow**, a high-performance, real-time multiplayer web-based chess engine and application.
 
 Play it live here: 👉 **[https://rudra2609.github.io/Tactic_Flow/](https://rudra2609.github.io/Tactic_Flow/)**
 
-![Tactic Flow](https://github.com/user-attachments/assets/1903e52b-59d7-4433-b17e-639462da5ae0)
+![Tactic Flow Preview](https://github.com/user-attachments/assets/1903e52b-59d7-4433-b17e-639462da5ae0)
 
 ---
 
 ## ✨ Features
 
 - **Blazing Fast AI Engine**: At its core, Tactic Flow runs a custom **C++ Chess Engine** that has been compiled directly into **WebAssembly (WASM)**. This allows the AI to calculate deep variations and evaluate positions at near-native speeds directly in your browser without requiring a backend server.
-- **Player vs AI & Player vs Player Modes**: Test your skills against the built-in AI with an adjustable ELO slider (250 to 3200), or play locally against a friend with dedicated chess clocks.
-- **Interactive Board Editor**: Set up custom scenarios, puzzles, or historical game positions using the drag-and-drop Board Editor, and then instantly play them out against the AI.
-- **Secure Authentication**: Built-in **Firebase Authentication** allows players to securely log in, sign up, and see their personalized Display Names on the player dashboard.
-- **Stunning UI/UX**: Built with **React** and `react-chessboard`, featuring a beautiful glassmorphism aesthetic, fully responsive mobile support, smooth move animations, and both Drag & Drop + Click-to-Move support.
-- **Full Ruleset Support**: The underlying engine fully validates moves and perfectly understands Castling, En Passant, Pawn Promotion, Checkmates, and Stalemates.
+- **Online Real-Time Multiplayer**: Built with **Firebase Realtime Database**, you can seamlessly create lobbies, share room codes, and play live against friends anywhere in the world. Includes real-time chat and game synchronization.
+- **Advanced Match Controls**: 
+  - Send real-time **Draw Offers** to your opponent.
+  - Instantly **Resign** from matches.
+  - Built-in chess clocks and timer increments.
+- **Player vs AI & Local PvP**: Test your skills against the built-in AI with an adjustable ELO slider (250 to 3200), or play locally against a friend with dedicated side-by-side chess clocks.
+- **Interactive Board Editor (Custom Setup)**: Set up custom scenarios, puzzles, or historical game positions using the drag-and-drop Board Editor, and then instantly play them out against the AI at maximum difficulty.
+- **Secure Authentication**: Built-in **Firebase Authentication** allows players to securely log in, sign up, and track their identities across multiplayer sessions.
+- **Stunning UI/UX**: Built with **React** and `react-chessboard`, featuring a beautiful dark glassmorphism aesthetic, fully responsive mobile support, smooth move animations, and robust drag-and-drop validation.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Vite, CSS (Glassmorphism design)
+- **Frontend**: React, Vite, CSS (Dark Glassmorphism design)
 - **Chess Logic & UI**: `chess.js`, `react-chessboard`
 - **Core Engine**: C++
 - **Compilation**: Emscripten (WebAssembly)
-- **Authentication**: Firebase
+- **Backend / Real-Time Sync**: Firebase Realtime Database
+- **Authentication**: Firebase Auth
 - **Hosting**: GitHub Pages
 
 ---

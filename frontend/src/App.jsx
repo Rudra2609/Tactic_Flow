@@ -88,6 +88,7 @@ function App() {
   // Move history state
   const [chess] = useState(new Chess());
   const [moveHistory, setMoveHistory] = useState([]);
+  const [viewIndex, setViewIndex] = useState(-1);
 
   useEffect(() => {
     const initWasm = async () => {
@@ -343,6 +344,7 @@ function App() {
     chess.reset();
     setFen(wasmModule.getBoardState());
     setMoveHistory([]);
+    setViewIndex(-1);
     setGameMode(mode);
     setGameState(0);
     gameStateRef.current = 0;
@@ -492,6 +494,7 @@ function App() {
       try {
         chess.move({ from: fromStr, to: toStr, promotion: promoChars[promotionPiece] });
         setMoveHistory([...chess.history({ verbose: true })]);
+        setViewIndex(-1);
         setTimeout(() => {
           if (historyContainerRef.current) {
             historyContainerRef.current.scrollTo({
@@ -536,7 +539,7 @@ function App() {
 
   const onDrop = ({ sourceSquare, targetSquare }) => {
     setMoveFrom(null);
-    if (!wasmModule || gameState !== 0 || pendingPromotion) return false;
+    if (!wasmModule || gameState !== 0 || pendingPromotion || viewIndex !== -1) return false;
 
     try {
       const fromY = sourceSquare.charCodeAt(0) - 97;
@@ -578,7 +581,7 @@ function App() {
   };
 
   const onGameSquareClick = (...args) => {
-    if (gameState !== 0 || !wasmModule || pendingPromotion) return;
+    if (gameState !== 0 || !wasmModule || pendingPromotion || viewIndex !== -1) return;
     
     let square = typeof args[0] === 'string' ? args[0] : args[0]?.square;
     if (!square) return;
@@ -740,12 +743,16 @@ function App() {
 
   // Group moves into pairs for display
   const movePairs = [];
-  for (let i = 0; i < moveHistory.length; i += 2) {
-    movePairs.push({
-      white: moveHistory[i],
-      black: moveHistory[i + 1]
-    });
-  }
+  if (moveHistory.length > 0) {
+      for (let i = 0; i < moveHistory.length; i += 2) {
+        movePairs.push({
+          white: moveHistory[i],
+          black: moveHistory[i + 1] || null
+        });
+      }
+    }
+
+    const displayFen = viewIndex === -1 ? fen : (viewIndex === 0 ? (moveHistory.length > 0 ? moveHistory[0].before : fen) : moveHistory[viewIndex - 1].after);
 
   if (authLoading) return <div className="app-background"><p className="status-text" style={{ position: 'relative', zIndex: 1 }}>Loading...</p></div>;
   if (!user) return <div className="app-background"><Auth onAuthSuccess={() => {}} /></div>;
@@ -1037,17 +1044,59 @@ function App() {
 
             {activeTab === "history" ? (
               <div className="history-list" ref={historyContainerRef}>
-                {movePairs.map((pair, idx) => (
-                  <div key={idx} className="history-row">
-                    <div className="history-number">{idx + 1}.</div>
-                    <div className={`history-move ${moveHistory.length - 1 === idx * 2 ? 'active-move' : ''}`}>
-                      {formatSan(pair.white.san, 'white-piece')}
+                {movePairs.map((pair, idx) => {
+                  const whiteIdx = idx * 2;
+                  const blackIdx = idx * 2 + 1;
+                  const currentIdx = viewIndex === -1 ? moveHistory.length - 1 : viewIndex - 1;
+                  return (
+                    <div key={idx} className="history-row">
+                      <div className="history-number">{idx + 1}.</div>
+                      <div 
+                        className={`history-move ${currentIdx === whiteIdx ? 'active-move' : ''}`}
+                        onClick={() => setViewIndex(whiteIdx + 1)}
+                        style={{cursor: 'pointer'}}
+                      >
+                        {formatSan(pair.white.san, 'white-piece')}
+                      </div>
+                      <div 
+                        className={`history-move ${currentIdx === blackIdx ? 'active-move' : ''}`}
+                        onClick={() => pair.black && setViewIndex(blackIdx + 1)}
+                        style={{cursor: pair.black ? 'pointer' : 'default'}}
+                      >
+                        {pair.black ? formatSan(pair.black.san, 'black-piece') : ''}
+                      </div>
                     </div>
-                    <div className={`history-move ${moveHistory.length - 1 === idx * 2 + 1 ? 'active-move' : ''}`}>
-                      {pair.black ? formatSan(pair.black.san, 'black-piece') : ''}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+              
+              <div className="history-controls">
+                <button 
+                  className="history-btn" 
+                  onClick={() => setViewIndex(0)}
+                  disabled={viewIndex === 0 || moveHistory.length === 0}
+                >&lt;&lt;</button>
+                <button 
+                  className="history-btn" 
+                  onClick={() => setViewIndex(prev => (prev === -1 ? Math.max(0, moveHistory.length - 1) : Math.max(0, prev - 1)))}
+                  disabled={viewIndex === 0 || moveHistory.length === 0}
+                >&lt;</button>
+                <button 
+                  className="history-btn" 
+                  onClick={() => {
+                    setViewIndex(prev => {
+                      if (prev === -1) return -1;
+                      if (prev + 1 >= moveHistory.length) return -1;
+                      return prev + 1;
+                    });
+                  }}
+                  disabled={viewIndex === -1 || moveHistory.length === 0}
+                >&gt;</button>
+                <button 
+                  className="history-btn" 
+                  onClick={() => setViewIndex(-1)}
+                  disabled={viewIndex === -1 || moveHistory.length === 0}
+                >&gt;&gt;</button>
               </div>
             ) : (
               <div className="chat-container">

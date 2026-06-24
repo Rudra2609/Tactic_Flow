@@ -1351,7 +1351,6 @@ function App() {
                       <span className="elo-value">{elo}</span>
                     </div>
                     <input type="range" min="250" max="3200" step="50" value={elo} onChange={(e) => setElo(parseInt(e.target.value))} className="elo-slider" />
-                    <div className="elo-labels"><span>Beginner</span><span>Grandmaster</span></div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>

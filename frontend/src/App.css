@@ -587,23 +587,23 @@ body {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.90);
-  backdrop-filter: blur(200px);
-  -webkit-backdrop-filter: blur(200px);
+  background: #000;
   animation: fadeIn 0.25s ease;
-  transform: translateZ(0);
 }
-
 
 /* Lobby Modal */
 .lobby-overlay {
   position: fixed;
   inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .lobby-modal {
@@ -1608,10 +1608,14 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
   justify-content: flex-end;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .settings-drawer {
@@ -1959,11 +1963,15 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .confirm-dialog {

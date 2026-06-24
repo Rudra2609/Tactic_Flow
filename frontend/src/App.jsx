@@ -396,7 +396,7 @@ function App() {
         scheduledAt: createTournamentScheduled && createTournamentScheduleDate ? new Date(createTournamentScheduleDate).getTime() : null,
         status: "waiting",
         inviteCode: code,
-        players: { [user.uid]: { name: user.displayName || user.email.split('@')[0], joinedAt: Date.now() } },
+        players: {},
         createdAt: Date.now(),
         winner: null
       };
@@ -497,7 +497,8 @@ function App() {
           player2: padded[i + 1],
           winner: null,
           status: padded[i] && padded[i + 1] ? "pending" : "bye",
-          roomId: null
+          roomId: null,
+          ready: {}
         };
         matchId++;
       }
@@ -514,7 +515,8 @@ function App() {
           player2: shuffled[j],
           winner: null,
           status: "pending",
-          roomId: null
+          roomId: null,
+          ready: {}
         };
         matchId++;
       }
@@ -535,6 +537,40 @@ function App() {
     } catch (e) { console.error(e); setTournamentError("Failed to start tournament"); }
   };
 
+  const toggleReady = async (matchId) => {
+    if (!tournamentCode) return;
+    const match = (tournamentMatches || {})[matchId];
+    if (!match) return;
+    if (match.player1 !== user.uid && match.player2 !== user.uid) return;
+    const currentReady = match.ready || {};
+    const newReady = !currentReady[user.uid];
+    await update(ref(db, `tournaments/${tournamentCode}/matches/${matchId}`), {
+      [`ready/${user.uid}`]: newReady
+    });
+  };
+
+  const startTournamentMatch = async (matchId) => {
+    if (!tournamentCode || !activeTournament) return;
+    if (activeTournament.hostUid !== user.uid) return;
+    const match = (tournamentMatches || {})[matchId];
+    if (!match) return;
+    const ready = match.ready || {};
+    if (!match.player1 || !match.player2) return;
+    if (!ready[match.player1] || !ready[match.player2]) return;
+    const matchRoomId = `tournament_${tournamentCode}_${matchId}`;
+    const gameRef = ref(db, `games/${matchRoomId}`);
+    await set(gameRef, {
+      hostName: tournamentPlayers[match.player1]?.name || 'Player 1',
+      guestName: tournamentPlayers[match.player2]?.name || 'Player 2',
+      status: "playing",
+      lastMove: null
+    });
+    await update(ref(db, `tournaments/${tournamentCode}/matches/${matchId}`), {
+      status: "playing",
+      roomId: matchRoomId
+    });
+  };
+
   const playTournamentMatch = async (matchId) => {
     if (!tournamentCode || !activeTournament) return;
     const match = (tournamentMatches || {})[matchId];
@@ -547,31 +583,14 @@ function App() {
     setShowTournamentMenu(false);
 
     const gameRef = ref(db, `games/${matchRoomId}`);
-    const snap = await get(gameRef);
-    const roomExists = snap.exists();
+    onDisconnect(gameRef).remove();
 
-    if (!roomExists) {
-      // First player: create the room
-      await set(gameRef, {
-        hostName: user.displayName || user.email.split('@')[0],
-        guestName: null,
-        status: "waiting",
-        lastMove: null
-      });
-      onDisconnect(gameRef).remove();
-      await update(ref(db, `tournaments/${tournamentCode}/matches/${matchId}`), { status: "playing" });
+    if (isPlayer1) {
       setPlayerColor("white");
       handleStartGame("online", "white");
       setGameMode("online");
       listenToOnlineRoom(matchRoomId, true, matchId);
     } else {
-      // Second player: join existing room
-      await update(gameRef, {
-        guestName: user.displayName || user.email.split('@')[0],
-        status: "playing"
-      });
-      onDisconnect(gameRef).remove();
-      await update(ref(db, `tournaments/${tournamentCode}/matches/${matchId}`), { status: "playing" });
       setPlayerColor("black");
       handleStartGame("online", "black");
       setGameMode("online");
@@ -1435,10 +1454,24 @@ function App() {
                                         <div className={`bracket-player ${m.winner === m.player1 ? 'winner' : ''}`}>{p1Name}</div>
                                         <div className="bracket-vs">vs</div>
                                         <div className={`bracket-player ${m.winner === m.player2 ? 'winner' : ''}`}>{p2Name}</div>
-                                        {m.status === "pending" && isMyMatch && m.player1 && m.player2 && (
-                                          <button className="btn btn-sm btn-primary" onClick={() => playTournamentMatch(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>Play</button>
+                                        {m.status === "pending" && m.player1 && m.player2 && (
+                                          <>
+                                            {isMyMatch ? (
+                                              <button className={`btn btn-sm${(m.ready || {})[user.uid] ? '' : ' btn-primary'}`} onClick={() => toggleReady(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>
+                                                {(m.ready || {})[user.uid] ? 'Not Ready' : 'Ready'}
+                                              </button>
+                                            ) : null}
+                                            {activeTournament.hostUid === user.uid && (m.ready || {})[m.player1] && (m.ready || {})[m.player2] && (
+                                              <button className="btn btn-sm btn-primary" onClick={() => startTournamentMatch(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>
+                                                Start Match
+                                              </button>
+                                            )}
+                                          </>
                                         )}
                                         {m.status === "bye" && <span className="bracket-bye">Bye</span>}
+                                        {m.status === "playing" && isMyMatch && (
+                                          <button className="btn btn-sm btn-primary" onClick={() => playTournamentMatch(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>Play</button>
+                                        )}
                                         {m.status === "finished" && (
                                           <span className="bracket-result">{m.winner ? `${tournamentPlayers[m.winner]?.name || '?'} wins` : 'Draw'}</span>
                                         )}
@@ -1460,7 +1493,21 @@ function App() {
                                   <div className={`bracket-player ${m.winner === m.player1 ? 'winner' : ''}`}>{p1Name}</div>
                                   <div className="bracket-vs">vs</div>
                                   <div className={`bracket-player ${m.winner === m.player2 ? 'winner' : ''}`}>{p2Name}</div>
-                                  {m.status === "pending" && isMyMatch && m.player1 && m.player2 && (
+                                  {m.status === "pending" && m.player1 && m.player2 && (
+                                    <>
+                                      {isMyMatch ? (
+                                        <button className={`btn btn-sm${(m.ready || {})[user.uid] ? '' : ' btn-primary'}`} onClick={() => toggleReady(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>
+                                          {(m.ready || {})[user.uid] ? 'Not Ready' : 'Ready'}
+                                        </button>
+                                      ) : null}
+                                      {activeTournament.hostUid === user.uid && (m.ready || {})[m.player1] && (m.ready || {})[m.player2] && (
+                                        <button className="btn btn-sm btn-primary" onClick={() => startTournamentMatch(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>
+                                          Start Match
+                                        </button>
+                                      )}
+                                    </>
+                                  )}
+                                  {m.status === "playing" && isMyMatch && (
                                     <button className="btn btn-sm btn-primary" onClick={() => playTournamentMatch(mid)} style={{ marginTop: '0.35rem', width: '100%' }}>Play</button>
                                   )}
                                   {m.status === "finished" && (

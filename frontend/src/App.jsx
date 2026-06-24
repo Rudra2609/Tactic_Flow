@@ -1251,7 +1251,6 @@ function App() {
     <div className={`app-background theme-${theme}`}>
       <div className="grid-overlay" />
       <div className="noise-overlay" />
-      <div className={`modal-backdrop${(showLobbyModal || showAISetup || showPVPSetup || showTournamentMenu || showCreateTournament || showSettings || pendingResign || pendingEnd) ? ' active' : ''}`} />
       {gameMode === "menu" ? (
         <div className="hero-wrapper">
           <div className="title-section">
@@ -1291,6 +1290,10 @@ function App() {
               <span className="mode-desc">Theme & preferences</span>
             </button>
           </div>
+
+          {(showLobbyModal || showAISetup || showPVPSetup || showTournamentMenu || showCreateTournament) && (
+            <div className="modal-backdrop" />
+          )}
 
           {showLobbyModal && (
             <div className="lobby-overlay" onClick={() => setShowLobbyModal(false)}>

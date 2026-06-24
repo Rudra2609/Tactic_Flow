@@ -1501,7 +1501,7 @@ function App() {
                 ) : (
                   <>
                     <h3 style={{ color: '#f59e0b', margin: '0 0 1rem 0' }}>🏆 Tournaments</h3>
-                    <button className="btn btn-sm btn-primary" onClick={() => setShowCreateTournament(true)} style={{ width: '100%' }}>Create Tournament</button>
+                    <button className="btn btn-sm btn-primary" onClick={() => { setShowTournamentMenu(false); setShowCreateTournament(true); }} style={{ width: '100%' }}>Create Tournament</button>
                     <div style={{ margin: '0.75rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <input type="text" placeholder="Enter Tournament Code" value={tournamentJoinCode} onChange={(e) => setTournamentJoinCode(e.target.value)} className="lobby-input" />
                       <div className="lobby-buttons">

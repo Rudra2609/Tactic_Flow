@@ -582,6 +582,18 @@ body {
   margin: 0;
 }
 
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease;
+  transform: translateZ(0);
+}
+
 /* Lobby Modal */
 .lobby-overlay {
   position: fixed;

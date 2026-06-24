@@ -1291,6 +1291,10 @@ function App() {
             </button>
           </div>
 
+          {(showLobbyModal || showAISetup || showPVPSetup || showTournamentMenu || showCreateTournament) && (
+            <div className="modal-backdrop" />
+          )}
+
           {showLobbyModal && (
             <div className="lobby-overlay" onClick={() => setShowLobbyModal(false)}>
               <div className="lobby-modal" onClick={e => e.stopPropagation()}>

@@ -587,9 +587,9 @@ body {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10000px);
-  -webkit-backdrop-filter: blur(10000px);
+  background: rgba(0, 0, 0, 0.90);
+  backdrop-filter: blur(5000px);
+  -webkit-backdrop-filter: blur(5000px);
   animation: fadeIn 0.25s ease;
   transform: translateZ(0);
 }

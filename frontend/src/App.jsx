@@ -658,6 +658,9 @@ function App() {
   const advanceTournamentBracket = async (finishedMatchId, winnerUid) => {
     if (!tournamentCode || !activeTournament) return;
     const matches = { ...tournamentMatches };
+    if (matches[finishedMatchId]) {
+      matches[finishedMatchId] = { ...matches[finishedMatchId], status: "finished", winner: winnerUid };
+    }
     const finishedMatch = matches[finishedMatchId];
     if (!finishedMatch) return;
 
@@ -679,7 +682,7 @@ function App() {
       for (let i = 0; i < winners.length; i += 2) {
         nextMatches[`m${nextRound}_${mid}`] = {
           round: nextRound, player1: winners[i], player2: winners[i + 1] || null,
-          winner: null, status: winners[i + 1] ? "pending" : "bye", roomId: null
+          winner: null, status: winners[i + 1] ? "pending" : "bye", roomId: null, ready: {}
         };
         mid++;
       }

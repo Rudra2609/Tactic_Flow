@@ -120,6 +120,7 @@ body {
   align-items: center;
   overflow: hidden;
   background-color: var(--bg-dark);
+  isolation: isolate;
 }
 
 .app-background::before, 
@@ -188,6 +189,7 @@ body {
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateZ(0);
 }
 
 /* ===== HERO / MENU LAYOUT ===== */
@@ -293,6 +295,7 @@ body {
   font-family: inherit;
   position: relative;
   overflow: hidden;
+  transform: translateZ(0);
 }
 
 .mode-card::before {
@@ -591,6 +594,7 @@ body {
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .lobby-modal {
@@ -604,6 +608,7 @@ body {
   max-width: 460px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   animation: scaleIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateZ(0);
 }
 
 .lobby-modal h3 {
@@ -749,6 +754,7 @@ body {
   align-items: center;
   border-radius: 4px;
   animation: fadeIn 0.4s ease;
+  transform: translateZ(0);
 }
 
 .board-overlay h2 {
@@ -796,6 +802,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 1rem 1.25rem;
+  transform: translateZ(0);
 }
 
 /* Circular Clocks */
@@ -1016,6 +1023,7 @@ body {
   display: flex;
   flex-direction: column;
   max-height: calc(75vh + 20px);
+  transform: translateZ(0);
 }
 
 .history-title {
@@ -1324,6 +1332,7 @@ body {
   text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   animation: slideDown 0.3s ease-out;
+  transform: translateZ(0);
 }
 
 .draw-offer-toast p {
@@ -1409,6 +1418,7 @@ body {
   justify-content: center;
   transition: all 0.15s ease;
   padding: 0;
+  transform: translateZ(0);
 }
 
 .promotion-piece-btn:hover {
@@ -1451,6 +1461,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  transform: translateZ(0);
 }
 
 .editor-toolbar {
@@ -1592,6 +1603,7 @@ body {
   display: flex;
   justify-content: flex-end;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .settings-drawer {
@@ -1607,6 +1619,7 @@ body {
   padding: 2rem;
   overflow-y: auto;
   animation: slideInRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateZ(0);
 }
 
 @keyframes slideInRight {
@@ -1946,6 +1959,7 @@ body {
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .confirm-dialog {
@@ -1960,6 +1974,7 @@ body {
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.2s ease;
+  transform: translateZ(0);
 }
 
 .confirm-dialog h3 {

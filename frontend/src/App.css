@@ -588,8 +588,8 @@ body {
   inset: 0;
   z-index: 100;
   background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6000px);
-  -webkit-backdrop-filter: blur(6000px);
+  backdrop-filter: blur(10000px);
+  -webkit-backdrop-filter: blur(10000px);
   animation: fadeIn 0.25s ease;
   transform: translateZ(0);
 }

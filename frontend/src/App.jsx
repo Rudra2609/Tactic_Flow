@@ -64,7 +64,6 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
 
   // Display state
-  const [showCoordinates, setShowCoordinates] = useState(() => localStorage.getItem('tacticflow-coordinates') !== 'false');
   const [highlightLastMove, setHighlightLastMove] = useState(() => localStorage.getItem('tacticflow-highlight-last') !== 'false');
   const [confirmActions, setConfirmActions] = useState(() => localStorage.getItem('tacticflow-confirm') !== 'false');
   const [pendingPremove, setPendingPremove] = useState(null);
@@ -215,7 +214,6 @@ function App() {
 
   useEffect(() => { localStorage.setItem('tacticflow-theme', theme); }, [theme]);
 
-  useEffect(() => { localStorage.setItem('tacticflow-coordinates', showCoordinates); }, [showCoordinates]);
   useEffect(() => { localStorage.setItem('tacticflow-highlight-last', highlightLastMove); }, [highlightLastMove]);
   useEffect(() => { localStorage.setItem('tacticflow-confirm', confirmActions); }, [confirmActions]);
   useEffect(() => { localStorage.setItem('tacticflow-colorblind', colorblindMode); }, [colorblindMode]);
@@ -1573,13 +1571,6 @@ function App() {
                 <div className="settings-section">
                   <h4>Display</h4>
                   <div className="settings-toggle-row">
-                    <span>Board coordinates</span>
-                    <label className="toggle-switch">
-                      <input type="checkbox" checked={showCoordinates} onChange={e => setShowCoordinates(e.target.checked)} />
-                      <span className="toggle-slider" />
-                    </label>
-                  </div>
-                  <div className="settings-toggle-row">
                     <span>Highlight last move</span>
                     <label className="toggle-switch">
                       <input type="checkbox" checked={highlightLastMove} onChange={e => setHighlightLastMove(e.target.checked)} />
@@ -1895,7 +1886,7 @@ function App() {
                       ...(highlightLastMove && lastMoveFrom ? { [lastMoveFrom]: { backgroundColor: "rgba(255, 255, 0, 0.2)", boxShadow: "inset 0 0 10px rgba(255, 255, 0, 0.3)" } } : {}),
                       ...(highlightLastMove && lastMoveTo ? { [lastMoveTo]: { backgroundColor: "rgba(255, 255, 0, 0.2)", boxShadow: "inset 0 0 10px rgba(255, 255, 0, 0.3)" } } : {})
                     },
-                    showBoardNotation: showCoordinates,
+                    showBoardNotation: true,
                     darkSquareStyle: { backgroundColor: themeBoards[theme].dark },
                     lightSquareStyle: { backgroundColor: themeBoards[theme].light },
                     dropSquareStyle: { boxShadow: "inset 0 0 1px 6px rgba(14, 165, 233, 0.5)" },

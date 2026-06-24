@@ -420,8 +420,9 @@ function App() {
       if (!snap.exists()) { setTournamentError("Invalid tournament code"); return; }
       const data = snap.val();
       if (data.status !== "waiting") { setTournamentError("Tournament already started"); return; }
-      if (data.players[user.uid]) { setTournamentError("Already joined"); return; }
-      const playerCount = Object.keys(data.players || {}).length;
+      const players = data.players || {};
+      if (players[user.uid]) { setTournamentError("Already joined"); return; }
+      const playerCount = Object.keys(players).length;
       if (data.maxPlayers > 0 && playerCount >= data.maxPlayers) { setTournamentError("Tournament is full"); return; }
       await update(tRef, {
         [`players/${user.uid}`]: { name: user.displayName || user.email.split('@')[0], joinedAt: Date.now() }

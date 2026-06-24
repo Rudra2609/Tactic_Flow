@@ -1907,54 +1907,6 @@ body {
   margin-bottom: 0.35rem;
 }
 
-/* Piece Set */
-
-.piece-set-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
-.piece-set-card {
-  background: rgba(0,0,0,0.15);
-  border: 2px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: inherit;
-}
-
-.piece-set-card:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.15);
-  transform: translateY(-2px);
-}
-
-.piece-set-card.selected {
-  border-color: #a78bfa;
-  background: rgba(167,139,250,0.08);
-  box-shadow: 0 0 12px rgba(167,139,250,0.15);
-}
-
-.piece-set-preview {
-  display: flex;
-  gap: 0.3rem;
-  align-items: center;
-  font-size: 1.4rem;
-  height: 32px;
-}
-
-.piece-set-name {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
 /* Confirm dialog overlay */
 
 .confirm-overlay {

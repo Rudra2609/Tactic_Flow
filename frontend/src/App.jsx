@@ -88,8 +88,8 @@ function App() {
   const [forgotError, setForgotError] = useState('');
   const [verifySent, setVerifySent] = useState(false);
 
-  // Piece set state
-  const [pieceSet, setPieceSet] = useState(() => localStorage.getItem('tacticflow-piece-set') || 'standard');
+  // Piece set state (hardcoded to standard)
+  const pieceSet = 'standard';
 
   // Confirm action state
   const [pendingResign, setPendingResign] = useState(false);
@@ -218,7 +218,6 @@ function App() {
   useEffect(() => { localStorage.setItem('tacticflow-confirm', confirmActions); }, [confirmActions]);
   useEffect(() => { localStorage.setItem('tacticflow-colorblind', colorblindMode); }, [colorblindMode]);
   useEffect(() => { localStorage.setItem('tacticflow-piece-symbols', pieceSymbols); }, [pieceSymbols]);
-  useEffect(() => { localStorage.setItem('tacticflow-piece-set', pieceSet); }, [pieceSet]);
 
   const createRoom = async () => {
     try {
@@ -1157,11 +1156,7 @@ function App() {
     }
   };
 
-  const getPieceSrc = (color, type) => {
-    if (pieceSet === 'standard') return `pieces/${color}${type}.svg`;
-    if (pieceSet === 'unicode') return '';
-    return `pieces/${pieceSet}/${color}${type}.svg`;
-  };
+  const getPieceSrc = (color, type) => `pieces/${color}${type}.svg`;
 
   const getPieceChar = (color, type) => {
     const chars = { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘', P: '♙', k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
@@ -1199,8 +1194,6 @@ function App() {
     { id: 'bP', icon: <img src={getPieceSrc('b', 'P')} alt="bP" style={{width: '60%', height: '60%'}} /> },
     { id: 'eraser', icon: '❌' }
   ];
-
-  const pieceSetLabels = { standard: 'Standard', unicode: 'Unicode' };
 
   const formatTime = (seconds) => {
     if (timeControl.minutes === 0) return "∞";
@@ -1702,17 +1695,6 @@ function App() {
                   </div>
                 </div>
                 <div className="settings-section">
-                  <h4>Piece Style</h4>
-                  <div className="piece-set-grid">
-                    {Object.entries(pieceSetLabels).map(([key, label]) => (
-                      <button key={key} className={`piece-set-card ${pieceSet === key ? 'selected' : ''}`} onClick={() => setPieceSet(key)}>
-                        {key === 'unicode' ? <span className="piece-set-preview">♔♚</span> : <span className="piece-set-preview"><img src="pieces/wK.svg" alt="K" style={{height: 28}} /> <img src="pieces/bK.svg" alt="k" style={{height: 28}} /></span>}
-                        <span className="piece-set-name">{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="settings-section">
                   <h4>Theme</h4>
                   <div className="theme-grid">
                     {Object.entries(themeBoards).map(([key, colors]) => (
@@ -1902,10 +1884,10 @@ function App() {
               return (
                 <div className="promotion-popover" style={{ bottom: promoY + 'px', left: '50%', transform: 'translateX(-50%)' }}>
                   <div className="promotion-popover-row">
-                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(1)}>{pieceSet === 'unicode' ? <span style={{fontSize:'1.8rem'}}>{getPieceChar(pColor, 'Q')}</span> : <img src={getPieceSrc(pColor, 'Q')} alt="Queen" />}</button>
-                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(4)}>{pieceSet === 'unicode' ? <span style={{fontSize:'1.8rem'}}>{getPieceChar(pColor, 'R')}</span> : <img src={getPieceSrc(pColor, 'R')} alt="Rook" />}</button>
-                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(2)}>{pieceSet === 'unicode' ? <span style={{fontSize:'1.8rem'}}>{getPieceChar(pColor, 'B')}</span> : <img src={getPieceSrc(pColor, 'B')} alt="Bishop" />}</button>
-                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(3)}>{pieceSet === 'unicode' ? <span style={{fontSize:'1.8rem'}}>{getPieceChar(pColor, 'N')}</span> : <img src={getPieceSrc(pColor, 'N')} alt="Knight" />}</button>
+                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(1)}><img src={getPieceSrc(pColor, 'Q')} alt="Queen" /></button>
+                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(4)}><img src={getPieceSrc(pColor, 'R')} alt="Rook" /></button>
+                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(2)}><img src={getPieceSrc(pColor, 'B')} alt="Bishop" /></button>
+                    <button className="promotion-piece-btn" onClick={() => handlePromotionSelection(3)}><img src={getPieceSrc(pColor, 'N')} alt="Knight" /></button>
                   </div>
                 </div>
               );

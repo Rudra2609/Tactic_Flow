@@ -1291,7 +1291,7 @@ function App() {
             </button>
           </div>
 
-          {(showLobbyModal || showAISetup || showPVPSetup || showTournamentMenu || showCreateTournament) && (
+          {(showLobbyModal || showAISetup || showPVPSetup || showTournamentMenu || showCreateTournament || showSettings) && (
             <div className="modal-backdrop" />
           )}
 

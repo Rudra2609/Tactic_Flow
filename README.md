@@ -55,6 +55,13 @@ The multiplayer layer runs on **Firebase Realtime Database**, handling board syn
 - **Resign**, propagated immediately to the opponent
 - **In-game chat**, synced per room
 
+### 🏆 Tournaments
+- **Create or join via a shareable code**, with optional max player cap and scheduled start time
+- **Single elimination** — auto-seeds a bye-padded bracket (rounds padded to the next power of 2) and advances winners round by round until a champion remains
+- **Round robin** — generates every pairwise matchup and ranks players by win count once all matches finish
+- Each bracket match spins up its own live game room (reusing the same online-play, draw-offer, and resign logic as regular multiplayer) and reports results back into the bracket automatically
+- Live bracket view for all participants, with a host-only "start match" control once both players are ready
+
 ### ⏱️ Time Controls
 - Configurable chess clocks with custom time + increment
 - Independent dual timers for local PvP
@@ -98,7 +105,7 @@ The multiplayer layer runs on **Firebase Realtime Database**, handling board syn
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        Browser (Client)                     │
-│                                                             │
+│                                                               │
 │  ┌───────────────────┐        ┌──────────────────────────┐  │
 │  │     React App     │        │       Web Worker         │  │
 │  │   (Main Thread)   │        │      (AI Thread)         │  │
@@ -116,8 +123,8 @@ The multiplayer layer runs on **Firebase Realtime Database**, handling board syn
 │  │  ┌─────────────┐  │        ┌──────────────────────────┐  │
 │  │  │   Firebase  │  │◄──────►│  Firebase Auth Service   │  │
 │  │  │    Auth     │  │        └──────────────────────────┘  │
-│  │  └─────────────┘  │                                      │
-│  └───────────────────┘                                      │
+│  │  └─────────────┘  │                                       │
+│  └───────────────────┘                                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -237,6 +244,7 @@ emcc Board.cpp BoardAI.cpp AI.cpp Square.cpp WasmBindings.cpp \
 | **Local PvP** | Two players, one device, independent clocks. |
 | **Online Multiplayer** | Create a room, share the 6-character code. Supports draw offers, resign, chat. |
 | **Board Editor** | Place any position, set side to move, copy FEN, or launch it against the AI. |
+| **Tournaments** | Create or join a bracket by code. Single-elimination or round-robin, auto-advancing, run on the same online-match infrastructure. |
 
 ---
 
@@ -337,6 +345,12 @@ base: process.env.VERCEL ? '/' : '/Tactic_Flow/'
 This means the same codebase can also be deployed to GitHub Pages (with `base: '/Tactic_Flow/'`) if you fork it — Vercel sets the `VERCEL` env var automatically, GitHub Pages doesn't, so the right base path gets picked with no manual config needed.
 
 To deploy your own fork on Vercel: import the repo, set the **root directory to `frontend`**, and deploy.
+
+---
+
+## 📄 License
+
+No license file is currently published in this repository, so default copyright applies — all rights reserved by the author. If you want this open-source, add a `LICENSE` file (MIT is a common choice for portfolio projects) and update this section to match.
 
 ---
 

@@ -1,21 +1,14 @@
 # ♟️ Tactic Flow
 
-<div align="center">
-
-![Tactic Flow Banner](https://img.shields.io/badge/Tactic_Flow-Chess_Engine-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTUgMjBoMTR2Mkg1em0wLTJ2LTJIM3YtMmgyVjhoMlY2aDF2MmgxVjZoMXYyaDFWNmgxdjJIMXYtMkgxdi0yaC0ydjJIM3YtMkgxVjhoMlY2aDFWNGgxNnYyaDF2Mmgxdi0yaDFWNmgxdjJIMXYtMkgxVjhoMlY2aDFWNGgxNlY2aDF2MmgxVjhIMXYtMkgxVjZoMXYtMkg1eiIgZmlsbD0id2hpdGUiLz48L3N2Zz4=)
+**A real-time multiplayer chess platform powered by a custom C++ engine compiled to WebAssembly.**
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite)](https://vitejs.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com)
 [![WebAssembly](https://img.shields.io/badge/WebAssembly-C%2B%2B_Engine-654FF0?style=flat-square&logo=webassembly)](https://webassembly.org)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Play_Now!-success?style=flat-square&logo=github)](https://rudra2609.github.io/Tactic_Flow/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Play_Now!-success?style=flat-square&logo=vercel)](https://tactic-flow-nine.vercel.app/)
 
-**A high-performance, real-time multiplayer chess application powered by a custom C++ engine compiled to WebAssembly.**
-
-[▶ **Play Live**](https://rudra2609.github.io/Tactic_Flow/) · [🐛 Report Bug](https://github.com/Rudra2609/Tactic_Flow/issues) · [✨ Request Feature](https://github.com/Rudra2609/Tactic_Flow/issues)
-
-</div>
+[▶ **Play Live**](https://tactic-flow-nine.vercel.app/) · [🐛 Report Bug](https://github.com/Rudra2609/Tactic_Flow/issues) · [✨ Request Feature](https://github.com/Rudra2609/Tactic_Flow/issues)
 
 ---
 
@@ -23,13 +16,10 @@
 
 - [About the Project](#-about-the-project)
 - [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
+- [Tech Stack](#️-tech-stack)
+- [Architecture](#️-architecture)
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running Locally](#running-locally)
 - [Engine Compilation (Advanced)](#-engine-compilation-advanced)
 - [Game Modes](#-game-modes)
 - [AI Engine Deep Dive](#-ai-engine-deep-dive)
@@ -41,46 +31,48 @@
 
 ## 🎯 About the Project
 
-**Tactic Flow** is a full-featured, browser-based chess platform combining a native-speed AI opponent with real-time online multiplayer. Rather than relying on an external chess engine API, Tactic Flow ships with a **custom chess engine written in C++**, compiled to **WebAssembly (WASM)** via Emscripten. This means the AI runs entirely client-side at near-native performance, without any backend compute costs.
+**Tactic Flow** is a browser-based chess platform combining a self-written AI opponent with real-time online multiplayer. Instead of calling an external chess engine API, the AI is a **custom chess engine written in C++**, compiled to **WebAssembly** via Emscripten and run entirely client-side — no backend compute cost for move calculation.
 
-The multiplayer layer is powered by **Firebase Realtime Database**, enabling instant board synchronization, in-game chat, draw offers, and presence detection across players worldwide.
+The multiplayer layer runs on **Firebase Realtime Database**, handling board sync, room codes, in-game chat, draw offers, and disconnect cleanup.
 
-> Built as a portfolio project demonstrating full-stack web development, systems programming (C++), and game logic design.
+> Built as a portfolio project to demonstrate systems programming (C++), WASM interop, and full-stack web development in one app.
 
 ---
 
 ## ✨ Features
 
 ### 🤖 AI & Gameplay
-- **Custom C++ Chess Engine** compiled to WebAssembly — deep move calculation at native speed, directly in the browser
-- **Adjustable ELO Difficulty** — slider from **250 to 3200** controlling AI search depth (1–5 ply) and aggression
-- **Alpha-Beta Pruning** minimax algorithm for efficient move search
-- **Web Worker isolation** — AI computation runs in a separate thread, keeping the UI smooth and responsive at all times
-- **Full chess rule support** — castling, en passant, promotions, check/checkmate/stalemate detection
+- **Custom C++ chess engine** compiled to WebAssembly, running client-side at native speed
+- **Adjustable ELO slider (250–3200)** controlling both search depth and move quality (see [AI Deep Dive](#-ai-engine-deep-dive) for how)
+- **Minimax with alpha-beta pruning**, depth scaling from 1 to 5 ply by ELO band
+- **Web Worker isolation** — the engine runs on a separate thread so AI search never blocks the UI
+- Full rules support: castling, en passant, promotion, check/checkmate/stalemate detection
 
 ### 🌐 Multiplayer
-- **Real-Time Online Play** via Firebase Realtime Database — create a room, share a code, play instantly
-- **Presence Detection** — opponent disconnection is handled gracefully
-- **In-game Draw Offers** — send and respond to draw proposals in real time
-- **Resign** — forfeit at any time with immediate result propagation
+- **Real-time online play** over Firebase Realtime Database — create a room, share a 6-character code, play instantly
+- **Disconnect handling** via Firebase `onDisconnect` — abandoned rooms clean themselves up
+- **Draw offers** with a full offer / accept / decline flow, synced live between both players
+- **Resign**, propagated immediately to the opponent
+- **In-game chat**, synced per room
 
 ### ⏱️ Time Controls
-- Configurable **chess clocks** with custom time and increment settings
-- Dual side-by-side timers for local PvP
-- Time-loss handled as a game-over condition
+- Configurable chess clocks with custom time + increment
+- Independent dual timers for local PvP
+- Timeout is a proper game-over condition (including timeout-vs-insufficient-material draws)
 
 ### 🗂️ Board Editor
-- **Drag-and-drop Board Editor** for setting up custom positions, puzzles, or historical games
-- Play any custom position against the AI at full strength
+- Drag-and-drop position editor — place/remove any piece, set side to move, copy out the resulting FEN
+- Launch any custom position straight into a game against the AI
 
 ### 🔐 Authentication
-- **Firebase Email/Password Authentication** — sign up, log in, and carry your display name into multiplayer rooms
+- Firebase email/password auth, with **email verification** and **password reset** flows
+- Display name carries into multiplayer rooms
 
 ### 🎨 UI / UX
-- **Dark Glassmorphism** aesthetic — modern frosted-glass panels, dark background, subtle glow effects
-- Built with `react-chessboard` for smooth drag-and-drop piece movement and animations
-- **Fully responsive** — works on desktop, tablet, and mobile
-- Move history panel, legal move highlighting, and promotion dialog
+- Dark glassmorphism theme — frosted panels, subtle glow, dark background
+- Built on `react-chessboard` for drag-and-drop piece movement
+- Responsive across desktop, tablet, and mobile
+- Move history, legal-move highlighting, promotion dialog
 
 ---
 
@@ -88,15 +80,15 @@ The multiplayer layer is powered by **Firebase Realtime Database**, enabling ins
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **Frontend Framework** | React 19 + Vite 8 | Component-based UI and fast HMR dev server |
-| **Chess UI** | `react-chessboard` v5 | Interactive board rendering with drag-and-drop |
-| **Chess Logic** | `chess.js` v1.4 | Move validation, FEN parsing, game state |
-| **Core AI Engine** | C++ (custom) | Minimax + alpha-beta pruning move search |
-| **WASM Compilation** | Emscripten | Transpiles C++ engine to `.wasm` + JS glue |
-| **AI Threading** | Web Workers API | Offloads AI computation off the main thread |
-| **Realtime Multiplayer** | Firebase Realtime DB | Board sync, room management, chat, presence |
-| **Authentication** | Firebase Auth | Secure email/password sign-in |
-| **Hosting** | GitHub Pages | Static site hosting via `gh-pages` |
+| **Frontend Framework** | React 19 + Vite 8 | Component UI, fast HMR dev server |
+| **Chess UI** | `react-chessboard` v5 | Drag-and-drop board rendering |
+| **Chess Logic (client)** | `chess.js` v1.4 | FEN parsing, client-side move bookkeeping |
+| **Core AI Engine** | C++ (custom) | Minimax + alpha-beta search, board representation |
+| **WASM Compilation** | Emscripten (Embind) | Compiles the C++ engine to `.wasm` + JS glue |
+| **AI Threading** | Web Workers API | Runs the WASM engine off the main thread |
+| **Realtime Multiplayer** | Firebase Realtime Database | Room state, board sync, chat, draw offers, presence |
+| **Authentication** | Firebase Auth | Email/password sign-in, verification, password reset |
+| **Hosting** | Vercel | Static hosting + analytics/speed insights |
 | **Styling** | Custom CSS | Glassmorphism dark theme |
 
 ---
@@ -106,34 +98,34 @@ The multiplayer layer is powered by **Firebase Realtime Database**, enabling ins
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        Browser (Client)                     │
-│                                                             │
+│                                                               │
 │  ┌───────────────────┐        ┌──────────────────────────┐  │
 │  │     React App     │        │       Web Worker         │  │
 │  │   (Main Thread)   │        │      (AI Thread)         │  │
-│  │                   │        │                          │  │
-│  │  ┌─────────────┐  │  msg   │  ┌────────────────────┐  │  │
-│  │  │  chess.js   │  │◄──────►│  │  chess_module.wasm │  │  │
-│  │  │ (rules/FEN) │  │        │  │  (C++ AI Engine)   │  │  │
+│  │                   │  msg   │                          │  │
+│  │  ┌─────────────┐  │◄──────►│  ┌────────────────────┐  │  │
+│  │  │  chess.js   │  │        │  │  chess_module.wasm │  │  │
+│  │  │ (FEN/state) │  │        │  │  (C++ AI Engine)   │  │  │
 │  │  └─────────────┘  │        │  └────────────────────┘  │  │
 │  │                   │        └──────────────────────────┘  │
-│  │  ┌─────────────┐  │                                      │
+│  │  ┌─────────────┐  │                                       │
 │  │  │ react-chess-│  │        ┌──────────────────────────┐  │
-│  │  │    board    │  │        │   Firebase Realtime DB   │  │
-│  │  └─────────────┘  │◄──────►│   (Multiplayer sync)     │  │
+│  │  │    board    │  │◄──────►│   Firebase Realtime DB   │  │
+│  │  └─────────────┘  │        │   (multiplayer sync)     │  │
 │  │                   │        └──────────────────────────┘  │
-│  │  ┌─────────────┐  │                                      │
-│  │  │   Firebase  │  │        ┌──────────────────────────┐  │
-│  │  │    Auth     │  │◄──────►│  Firebase Auth Service   │  │
-│  │  └─────────────┘  │        └──────────────────────────┘  │
-│  └───────────────────┘                                      │
+│  │  ┌─────────────┐  │        ┌──────────────────────────┐  │
+│  │  │   Firebase  │  │◄──────►│  Firebase Auth Service   │  │
+│  │  │    Auth     │  │        └──────────────────────────┘  │
+│  │  └─────────────┘  │                                       │
+│  └───────────────────┘                                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Key Design Decisions:**
-- The C++ engine is **compiled once** to WASM and served as a static file — no server needed for AI
-- The Web Worker ensures AI `getBestMove()` calls never block the React render loop
-- Firebase provides a **serverless** multiplayer backend — no Node/Express server to maintain
-- Vite is configured with `base: '/Tactic_Flow/'` for correct GitHub Pages asset paths
+**Key design decisions:**
+- The C++ engine is compiled once to WASM and served as a static asset — no server needed for AI moves
+- The Web Worker keeps `getBestMove()` off the render thread, so the board never freezes mid-search
+- Firebase gives a serverless multiplayer backend — no Node/Express server to run or maintain
+- `vite.config.js` switches `base` between `/` (Vercel) and `/Tactic_Flow/` (GitHub Pages) via the `VERCEL` env var, so the same build works on either host
 
 ---
 
@@ -142,28 +134,28 @@ The multiplayer layer is powered by **Firebase Realtime Database**, enabling ins
 ```
 Tactic_Flow/
 │
-├── 📄 Board.cpp / Board.h         # Chess board representation, move generation
-├── 📄 AI.cpp / AI.h               # Minimax + alpha-beta AI search
-├── 📄 BoardAI.cpp                 # Board evaluation & AI-specific move methods
-├── 📄 Square.cpp / Square.h       # Chess square and piece types
-├── 📄 WasmBindings.cpp            # Emscripten JS <-> C++ interface bindings
+├── Board.cpp / Board.h         # Board representation, move generation, FEN
+├── AI.cpp / AI.h                # Minimax + alpha-beta search, ELO-based depth/blunder logic
+├── BoardAI.cpp                  # Legal move generation, makeMoveAI, evaluate()
+├── Square.cpp / Square.h        # Square/piece representation
+├── WasmBindings.cpp              # Emscripten Embind bindings (C++ <-> JS)
 │
-└── frontend/                      # React + Vite web app
+└── frontend/                    # React + Vite app
     ├── public/
-    │   ├── chess_module.js        # Emscripten-generated WASM JS glue code
-    │   ├── chess_module.wasm      # Compiled WebAssembly binary (C++ engine)
-    │   └── ai_worker.js           # Web Worker: loads WASM, handles AI requests
+    │   ├── chess_module.js       # Emscripten-generated JS glue
+    │   ├── chess_module.wasm     # Compiled engine binary
+    │   └── ai_worker.js          # Web Worker: loads WASM, handles AI requests
     │
     ├── src/
-    │   ├── App.jsx                # Root component: game modes, board, state
-    │   ├── App.css                # Main styles (glassmorphism theme)
-    │   ├── Auth.jsx               # Login/Sign-up form component
-    │   ├── Auth.css               # Auth page styles
-    │   ├── firebase.js            # Firebase app initialization & exports
-    │   └── main.jsx               # React DOM entry point
+    │   ├── App.jsx                # Game modes, board state, multiplayer wiring
+    │   ├── App.css                # Glassmorphism theme
+    │   ├── Auth.jsx                # Login / sign-up
+    │   ├── Auth.css
+    │   ├── firebase.js             # Firebase init
+    │   └── main.jsx                # React entry point
     │
-    ├── package.json               # Dependencies & scripts
-    └── vite.config.js             # Vite config (base path for GitHub Pages)
+    ├── package.json
+    └── vite.config.js              # base path switches on VERCEL env var
 ```
 
 ---
@@ -171,72 +163,51 @@ Tactic_Flow/
 ## 🚀 Getting Started
 
 ### Prerequisites
+- **Node.js** >= 18.x
+- **npm** >= 9.x
+- A modern browser
 
-Make sure you have the following installed:
-
-- **Node.js** >= 18.x ([Download](https://nodejs.org/))
-- **npm** >= 9.x (comes with Node.js)
-- A modern browser (Chrome, Firefox, Edge, Safari)
-
-> **Note:** You do **not** need C++, Emscripten, or any native toolchain to run the frontend. The pre-compiled `chess_module.wasm` binary is already included in `frontend/public/`.
+> You don't need C++ or Emscripten to run the frontend — the pre-built `chess_module.wasm` already ships in `frontend/public/`.
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Rudra2609/Tactic_Flow.git
-   cd Tactic_Flow
-   ```
-
-2. **Navigate to the frontend directory:**
-   ```bash
-   cd frontend
-   ```
-
-3. **Install Node.js dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/Rudra2609/Tactic_Flow.git
+cd Tactic_Flow/frontend
+npm install
+```
 
 ### Running Locally
-
-Start the Vite development server:
 
 ```bash
 npm run dev
 ```
 
-Open your browser and go to `http://localhost:5173` (or the port Vite shows in the terminal).
-
-Other available scripts:
+Open `http://localhost:5173` (or whatever port Vite prints).
 
 ```bash
-npm run build     # Build for production (outputs to dist/)
-npm run preview   # Preview the production build locally
-npm run lint      # Run ESLint
+npm run build     # production build → dist/
+npm run preview   # preview the production build
+npm run lint      # ESLint
 ```
 
 ---
 
 ## 🔧 Engine Compilation (Advanced)
 
-This section is only needed if you modify the core C++ engine source files (`Board.cpp`, `AI.cpp`, `BoardAI.cpp`, `Square.cpp`, or `WasmBindings.cpp`).
+Only needed if you touch the C++ source (`Board.cpp`, `AI.cpp`, `BoardAI.cpp`, `Square.cpp`, `WasmBindings.cpp`).
 
-### Prerequisites
-
-Install the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html):
+Install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html):
 
 ```bash
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install latest
 ./emsdk activate latest
-source ./emsdk_env.sh  # (or emsdk_env.bat on Windows)
+source ./emsdk_env.sh   # emsdk_env.bat on Windows
 ```
 
-### Compile the WASM module
-
-From the project root (where the `.cpp` files live):
+From the project root:
 
 ```bash
 emcc Board.cpp BoardAI.cpp AI.cpp Square.cpp WasmBindings.cpp \
@@ -248,17 +219,13 @@ emcc Board.cpp BoardAI.cpp AI.cpp Square.cpp WasmBindings.cpp \
   --bind
 ```
 
-This will overwrite `frontend/public/chess_module.js` and `frontend/public/chess_module.wasm` with your updated engine.
-
-**Emscripten flags explained:**
-
 | Flag | Purpose |
 |---|---|
-| `-s EXPORT_ES6=1` | Outputs as an ES module (compatible with Vite) |
-| `-s MODULARIZE=1` | Wraps the module in a factory function (`chess_module()`) |
-| `-s ENVIRONMENT=web` | Targets browser environment only |
-| `-O3` | Maximum optimization level for fastest runtime performance |
-| `--bind` | Enables Embind for C++ ↔ JavaScript function bindings |
+| `-s EXPORT_ES6=1` | Output as an ES module (Vite-compatible) |
+| `-s MODULARIZE=1` | Wrap output in a factory function |
+| `-s ENVIRONMENT=web` | Target browser only |
+| `-O3` | Max optimization |
+| `--bind` | Enable Embind for C++ ↔ JS bindings |
 
 ---
 
@@ -266,54 +233,58 @@ This will overwrite `frontend/public/chess_module.js` and `frontend/public/chess
 
 | Mode | Description |
 |---|---|
-| **Player vs AI** | Play against the custom C++ engine. Adjust difficulty via the ELO slider (250–3200). The AI runs in a Web Worker for non-blocking, smooth gameplay. |
-| **Local PvP** | Two players share one device. Each side has their own chess clock with configurable time controls. |
-| **Online Multiplayer** | One player creates a room and shares the 6-character room code. The other joins and plays in real time over Firebase. Supports draw offers, resign, and chat. |
-| **Board Editor** | Freely place or remove pieces to construct any position. Once satisfied, launch the position against the AI at maximum strength. |
+| **Player vs AI** | Adjustable ELO (250–3200) via slider. Runs in a Web Worker. |
+| **Local PvP** | Two players, one device, independent clocks. |
+| **Online Multiplayer** | Create a room, share the 6-character code. Supports draw offers, resign, chat. |
+| **Board Editor** | Place any position, set side to move, copy FEN, or launch it against the AI. |
 
 ---
 
 ## 🧠 AI Engine Deep Dive
 
-The AI is a classical minimax search with alpha-beta pruning, implemented entirely in C++ for maximum performance and compiled to WebAssembly.
+The engine is minimax with alpha-beta pruning, written in C++ and compiled to WASM.
 
-### Depth Scaling by ELO
+### How ELO actually maps to behavior
 
-The AI scales its search depth to simulate different skill levels:
+ELO controls **two independent things**, not just search depth:
+
+**1. Search depth:**
 
 | ELO Range | Search Depth |
 |---|---|
 | ≤ 600 | 1 ply |
-| 601 – 1000 | 2 ply |
-| 1001 – 1500 | 3 ply |
-| 1501 – 2200 | 4 ply |
+| 601–1000 | 2 ply |
+| 1001–1500 | 3 ply |
+| 1501–2200 | 4 ply |
 | > 2200 | 5 ply |
 
-### Algorithm
+**2. Blunder probability** (the bigger lever at low ELO): below ELO 1500, the engine has a chance to ignore its own search result and play a random legal move instead — scaling linearly from **70% at ELO 250 down to 0% at ELO 1500**. Depth-1 search alone doesn't make a weak-feeling opponent; the random-move injection does most of that work at the low end, while depth scaling matters more once blunders phase out above 1500.
 
-- **Minimax** with full game-tree search at the configured depth
-- **Alpha-Beta Pruning** for up to ~10× speedup over naive minimax by discarding irrelevant branches
-- **Static evaluation** via `Board::evaluate()` — material balance, piece-square tables, king safety
-- **Stalemate & checkmate** detection at leaf nodes with depth-adjusted scores to prefer faster wins
+### Static evaluation
 
-### Web Worker Integration
+`Board::evaluate()` is straightforward material counting plus two small positional terms:
+- Standard material values (P=100, N=300, B=300, R=500, Q=900)
+- A small pawn-advancement bonus that grows as a pawn nears promotion
+- A small knight-centralization bonus (knights are worth more near the center)
+
+There are currently no piece-square tables and no king-safety term — the evaluation is intentionally simple, and most of the engine's "personality" at different ELOs comes from the blunder mechanism above, not from positional nuance.
+
+### Web Worker integration
 
 ```
-React UI  ──── postMessage({type:'calculate', fen, elo}) ────►  ai_worker.js
-          ◄─── postMessage({type:'result', move})  ──────────  (WASM loaded here)
+React UI ──── postMessage({type:'calculate', fen, elo}) ────► ai_worker.js
+         ◄─── postMessage({type:'result', move}) ──────────  (WASM lives here)
 ```
 
-The worker loads the WASM module once on startup. Every time it's the AI's turn, `App.jsx` posts the current FEN and ELO to the worker, which calls `wasmModule.getBestMove(elo)` and posts back the move string `"fromX,fromY,toX,toY"`.
+The worker loads the WASM module once on startup. On the AI's turn, `App.jsx` posts the FEN and ELO; the worker calls `getBestMove(elo)` and posts back a move string.
 
-### WASM Bindings (Emscripten Embind)
-
-The following C++ functions are exported to JavaScript via `WasmBindings.cpp`:
+### WASM bindings (Emscripten Embind)
 
 | JS Function | C++ Implementation | Description |
 |---|---|---|
 | `initBoard()` | `Board::setBoard()` | Reset to starting position |
-| `setBoardFromFEN(fen)` | `Board::setBoardFromFEN()` | Load arbitrary position |
-| `getBestMove(elo)` | `AI::getBestMove()` | Run minimax search, return move string |
+| `setBoardFromFEN(fen)` | `Board::setBoardFromFEN()` | Load an arbitrary position |
+| `getBestMove(elo)` | `AI::getBestMove()` | Run search (with blunder logic), return a move string |
 | `makeMove(fx,fy,tx,ty,promo)` | `Board::makeMoveAI()` | Apply a move |
 | `getBoardState()` | `Board::generatePositionString()` | Export current FEN |
 | `getGameState()` | `Board::getGameState()` | Checkmate/stalemate/draw status |
@@ -322,81 +293,50 @@ The following C++ functions are exported to JavaScript via `WasmBindings.cpp`:
 
 ## 🔥 Firebase Setup
 
-To run the multiplayer features in your own fork, set up a Firebase project:
+To run multiplayer in your own fork:
 
-1. Go to [Firebase Console](https://console.firebase.google.com/) and create a new project.
+1. Create a project in the [Firebase Console](https://console.firebase.google.com/)
+2. Enable **Authentication** → Email/Password
+3. Enable **Realtime Database**, with dev rules like:
 
-2. Enable **Authentication** → Email/Password sign-in method.
+```json
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}
+```
 
-3. Enable **Realtime Database** and set the following security rules for development:
-   ```json
-   {
-     "rules": {
-       ".read": "auth != null",
-       ".write": "auth != null"
-     }
-   }
-   ```
+4. Drop your config into `frontend/src/firebase.js`:
 
-4. Copy your Firebase project config and update `frontend/src/firebase.js`:
-   ```js
-   const firebaseConfig = {
-     apiKey: "YOUR_API_KEY",
-     authDomain: "YOUR_PROJECT.firebaseapp.com",
-     databaseURL: "https://YOUR_PROJECT-default-rtdb.REGION.firebasedatabase.app",
-     projectId: "YOUR_PROJECT",
-     storageBucket: "YOUR_PROJECT.appspot.com",
-     messagingSenderId: "YOUR_SENDER_ID",
-     appId: "YOUR_APP_ID"
-   };
-   ```
+```js
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.REGION.firebasedatabase.app",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+```
 
 ---
 
 ## 🌍 Deployment
 
-The project is configured to deploy to **GitHub Pages** with the `base: '/Tactic_Flow/'` path in `vite.config.js`.
+The live build runs on **Vercel** at **[tactic-flow-nine.vercel.app](https://tactic-flow-nine.vercel.app/)**.
 
-### Build and deploy
+`vite.config.js` sets the asset base path conditionally:
 
-```bash
-# In frontend/
-npm run build
+```js
+base: process.env.VERCEL ? '/' : '/Tactic_Flow/'
 ```
 
-This outputs to `frontend/dist/`. Push the contents to your `gh-pages` branch or configure GitHub Actions for automated deployment.
+This means the same codebase can also be deployed to GitHub Pages (with `base: '/Tactic_Flow/'`) if you fork it — Vercel sets the `VERCEL` env var automatically, GitHub Pages doesn't, so the right base path gets picked with no manual config needed.
 
-### Automated GitHub Actions (optional)
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-      - run: cd frontend && npm install && npm run build
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/dist
-```
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+To deploy your own fork on Vercel: import the repo, set the **root directory to `frontend`**, and deploy.
 
 ---
 
@@ -406,8 +346,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-<div align="center">
-
-Made with ♟️ and ❤️ — [Play Tactic Flow](https://rudra2609.github.io/Tactic_Flow/)
-
-</div>
+Made with ♟️ and ❤️ — [Play Tactic Flow](https://tactic-flow-nine.vercel.app/)

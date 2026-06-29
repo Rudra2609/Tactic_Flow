@@ -98,7 +98,7 @@ The multiplayer layer runs on **Firebase Realtime Database**, handling board syn
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        Browser (Client)                     │
-│                                                               │
+│                                                             │
 │  ┌───────────────────┐        ┌──────────────────────────┐  │
 │  │     React App     │        │       Web Worker         │  │
 │  │   (Main Thread)   │        │      (AI Thread)         │  │
@@ -116,8 +116,8 @@ The multiplayer layer runs on **Firebase Realtime Database**, handling board syn
 │  │  ┌─────────────┐  │        ┌──────────────────────────┐  │
 │  │  │   Firebase  │  │◄──────►│  Firebase Auth Service   │  │
 │  │  │    Auth     │  │        └──────────────────────────┘  │
-│  │  └─────────────┘  │                                       │
-│  └───────────────────┘                                       │
+│  │  └─────────────┘  │                                      │
+│  └───────────────────┘                                      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
